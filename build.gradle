@@ -1,18 +1,27 @@
 project(":markdown-plugin") {
     apply plugin: 'java'
     defaultTasks 'jar'
+
     configurations {
         provided
     }
     sourceSets {
         main { compileClasspath += configurations.provided }
+        test
+    }
+    repositories {
+        jcenter()
     }
     dependencies {
+        compile 'org.pegdown:pegdown:1.6.0'
         provided project(":stub")
+        testCompile 'org.testng:testng:6.9.10'
+        testCompile project(":stub")
     }
+    test.useTestNG()
     jar {
         manifest {
-            attributes("OmegaT-Plugins": "tokyo.northside.omegat.MarkdownSearchFilter")
+            attributes("OmegaT-Plugins": "tokyo.northside.omegat.MarkdownFilter")
         }
     }
 }
