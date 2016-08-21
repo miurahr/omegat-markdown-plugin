@@ -1,0 +1,22 @@
+project(":markdown-plugin") {
+    apply plugin: 'java'
+    defaultTasks 'jar'
+    configurations {
+        provided
+    }
+    sourceSets {
+        main { compileClasspath += configurations.provided }
+    }
+    dependencies {
+        provided project(":stub")
+    }
+    jar {
+        manifest {
+            attributes("OmegaT-Plugins": "tokyo.northside.omegat.MarkdownSearchFilter")
+        }
+    }
+}
+
+project(":stub") {
+    apply plugin: 'java'
+}
