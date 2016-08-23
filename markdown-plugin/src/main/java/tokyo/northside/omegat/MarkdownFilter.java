@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 
 import org.omegat.core.Core;
 import org.omegat.filters2.AbstractFilter;

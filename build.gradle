@@ -1,5 +1,8 @@
 project(":markdown-plugin") {
     apply plugin: 'java'
+    apply plugin: 'jacoco'
+    apply plugin: 'findbugs'
+    apply plugin: 'checkstyle'
     defaultTasks 'jar'
 
     configurations {
@@ -22,6 +25,23 @@ project(":markdown-plugin") {
     jar {
         manifest {
             attributes("OmegaT-Plugins": "tokyo.northside.omegat.MarkdownFilter")
+        }
+    }
+    checkstyle {
+        config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
+        ignoreFailures = true
+        toolVersion = '7.1'
+    }
+    // Force prevent checkstyle/findbugs on Test.
+    task checkstyleTest(overwrite: true) << {}
+    task findbugsTest(overwrite: true) << {}
+    findbugs {
+        ignoreFailures = true
+    }
+    tasks.withType(FindBugs) {
+        reports {
+          xml.enabled = false
+          html.enabled = true
         }
     }
 }
