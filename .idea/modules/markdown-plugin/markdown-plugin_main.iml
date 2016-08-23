@@ -9,8 +9,10 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="module" module-name="stub_main" />
     <orderEntry type="library" name="Gradle: org.pegdown:pegdown:1.6.0" level="project" />
+    <orderEntry type="module" module-name="stub_main" />
+    <orderEntry type="library" name="Gradle: commons-io:commons-io:2.5" level="project" />
+    <orderEntry type="library" name="Gradle: org.apache.commons:commons-lang3:3.4" level="project" />
     <orderEntry type="library" name="Gradle: org.parboiled:parboiled-java:1.1.7" level="project" />
     <orderEntry type="library" name="Gradle: org.parboiled:parboiled-core:1.1.7" level="project" />
     <orderEntry type="library" name="Gradle: org.ow2.asm:asm:5.0.3" level="project" />

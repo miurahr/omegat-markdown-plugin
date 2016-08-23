@@ -17,6 +17,8 @@ project(":markdown-plugin") {
     }
     dependencies {
         compile 'org.pegdown:pegdown:1.6.0'
+        compile 'commons-io:commons-io:2.5'
+        compile 'org.apache.commons:commons-lang3:3.4'
         provided project(":stub")
         testCompile 'org.testng:testng:6.9.10'
         testCompile project(":stub")

@@ -1,16 +1,20 @@
 package tokyo.northside.omegat;
 
 import static org.testng.Assert.*;
+
+import org.omegat.filters2.FilterContext;
 import org.testng.annotations.*;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
+import java.io.File;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Test for MarkdownFilter plugin for omegat.
  * Created by miurahr on 16/08/23.
  */
-class MarkdownFilterTest  {
+class MarkdownFilterTest extends TestFilterBase {
     @Test
     void testGetFileFormatName() throws Exception {
         String expected = "Markdown Filter";
@@ -38,48 +42,31 @@ class MarkdownFilterTest  {
     }
 
     @Test
-    void testRequirePrevNextFields() throws Exception {
-        MarkdownFilter mdf = new MarkdownFilter();
-        assertFalse(mdf.requirePrevNextFields());
-    }
-
-    @Test
     void testIsFileSupported_true() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
-        try (BufferedReader reader = new BufferedReader(new
-                FileReader(this.getClass().getResource("/test.md").getFile()))) {
-            assertTrue(mdf.isFileSupported(reader));
-        }
+        File target = new File(this.getClass().getResource("/test.md").getFile());
+        FilterContext fc = new FilterContext();
+        assertTrue(mdf.isFileSupported(target, null, fc));
     }
 
     @Test
     void testIsFileSupported_false() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
-        try (BufferedReader reader = new BufferedReader(new
-                FileReader(this.getClass().getResource("/nomarkdown.txt").getFile()))) {
-            assertFalse(mdf.isFileSupported(reader));
-        }
+        File target = new File(this.getClass().getResource("/nomarkdown.txt").getFile());
+        FilterContext fc = new FilterContext();
+        assertFalse(mdf.isFileSupported(target, null, fc));
     }
 
     @Test
     void testProcessFile() throws Exception {
-
-    }
-
-    @Test
-    void testGetHeadingLevel_1() {
-        String source = "# HEADING";
-        int expect = 1;
         MarkdownFilter mdf = new MarkdownFilter();
-        assertEquals(mdf.getHeadingLevel(source), expect);
+        Map<String, String> options = new HashMap<>(64);
+        List<String> entries = parse(mdf, "/complex.md", options);
+        assertNotNull(entries);
+        assertNotEquals(entries.size(), 0);
+        for (String en: entries) {
+            System.out.print("test: ");
+            System.out.println(en);
+        }
     }
-
-    @Test
-    void testGetHeadingLevel_2() {
-        String source = "## HEADING";
-        int expect = 2;
-        MarkdownFilter mdf = new MarkdownFilter();
-        assertEquals(mdf.getHeadingLevel(source), expect);
-    }
-
 }
