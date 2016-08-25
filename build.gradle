@@ -8,35 +8,46 @@ project(":markdown-plugin") {
     configurations {
         provided
     }
+
     sourceSets {
         main { compileClasspath += configurations.provided }
         test
     }
+
     repositories {
         jcenter()
     }
+
     dependencies {
         compile 'org.pegdown:pegdown:1.6.0'
-        compile 'commons-io:commons-io:2.5'
-        compile 'org.apache.commons:commons-lang3:3.4'
+        provided 'commons-io:commons-io:2.4'
         provided project(":stub")
         testCompile 'org.testng:testng:6.9.10'
+        testCompile 'commons-io:commons-io:2.4'
         testCompile project(":stub")
     }
     test.useTestNG()
+
     jar {
+        from files(sourceSets.main.output.classesDir)
+        from {configurations.compile.collect {zipTree(it)}} {
+            exclude "META-INF/MANIFEST.MF"
+        }
         manifest {
             attributes("OmegaT-Plugins": "tokyo.northside.omegat.MarkdownFilter")
         }
     }
+
     checkstyle {
         config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
         ignoreFailures = true
         toolVersion = '7.1'
     }
+
     // Force prevent checkstyle/findbugs on Test.
     task checkstyleTest(overwrite: true) << {}
     task findbugsTest(overwrite: true) << {}
+
     findbugs {
         ignoreFailures = true
     }
