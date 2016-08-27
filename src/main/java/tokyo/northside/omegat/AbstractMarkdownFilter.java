@@ -6,12 +6,7 @@ package tokyo.northside.omegat;
 abstract class AbstractMarkdownFilter {
     protected StringBuilder outbuf;
     protected char[] articleBuf;
-
-    String getChars(final int start, final int end) {
-        char[] buf = new char[end - start];
-        System.arraycopy(articleBuf, start, buf, 0, end - start);
-        return String.valueOf(buf);
-    }
+    protected boolean tableMode = false;
 
     abstract void writeTranslate(final String text, final boolean trans);
     abstract void writeTranslate(final String text, final int start, final int end);
@@ -29,4 +24,14 @@ abstract class AbstractMarkdownFilter {
     String getOutbuf() {
         return outbuf.toString();
     }
+
+
+    public void startTable() {
+        tableMode = true;
+    }
+
+    public void endTable() {
+        tableMode = false;
+    }
+
 }

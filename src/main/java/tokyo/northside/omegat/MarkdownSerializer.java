@@ -3,7 +3,6 @@ package tokyo.northside.omegat;
 import org.pegdown.ast.*;
 
 import static org.parboiled.common.Preconditions.checkArgNotNull;
-import static org.parboiled.common.StringUtils.repeat;
 
 /**
  * Markdown parser and serializer class.
@@ -27,21 +26,31 @@ class MarkdownSerializer implements Visitor {
         visitChildren(node);
     }
 
-    public void visit(Node node) {
+    public void visit(TextNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
-
-    public void visit(AbbreviationNode node) {
-    }
-
-    public void visit(ReferenceNode node) {
-    }
-
 
     public void visit(AnchorLinkNode node) {
         markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(AutoLinkNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    public void visit(CodeNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    public void visit(InlineHtmlNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    public void visit(MailLinkNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    public void visit(SpecialTextNode node) {
         markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
@@ -61,90 +70,27 @@ class MarkdownSerializer implements Visitor {
         visitChildren(node);
     }
 
-    public void visit(CodeNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
-    }
-
-    public void visit(DefinitionListNode node) {
-    }
-
-    public void visit(DefinitionNode node) {
-    }
-
-    public void visit(DefinitionTermNode node) {
-    }
-
-    public void visit(ExpImageNode node) {
-    }
-
     public void visit(ExpLinkNode node) {
         visitChildren(node);
     }
 
     public void visit(HeaderNode node) {
         visitChildren(node);
-   }
-
-    public void visit(HtmlBlockNode node) {
     }
 
-    public void visit(InlineHtmlNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
-    }
-
-    public void visit(MailLinkNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
-    }
-
-    /**
-     * Start paragraph.
-     * @param node
-     */
     public void visit(ParaNode node) {
         visitChildren(node);
     }
 
-    /**
-     * Start quote block.
-     * @param node
-     */
     public void visit(QuotedNode node) {
         visitChildren(node);
     }
 
     public void visit(RefImageNode node) {
-        // fixme
     }
 
     public void visit(RefLinkNode node) {
-        // fixme
         visitChildren(node);
-    }
-
-    public void visit(SimpleNode node) {
-        switch (node.getType()) {
-            case Apostrophe:
-                markdownFilter.writeTranslate("'", false);
-                break;
-            case Ellipsis:
-                break;
-            case Emdash:
-                break;
-            case Endash:
-                break;
-            case HRule:
-                break;
-            case Linebreak:
-                break;
-            case Nbsp:
-                break;
-            default:
-                break;
-        }
-    }
-
-    public void visit(SpecialTextNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(StrikeNode node) {
@@ -156,34 +102,33 @@ class MarkdownSerializer implements Visitor {
     }
 
     public void visit(TableBodyNode node) {
+        visitChildren(node);
     }
 
     public void visit(TableCaptionNode node) {
+        visitChildren(node);
     }
 
     public void visit(TableCellNode node) {
+        visitChildren(node);
     }
 
     public void visit(TableColumnNode node) {
+        visitChildren(node);
     }
 
     public void visit(TableHeaderNode node) {
+        visitChildren(node);
     }
 
     public void visit(TableNode node) {
+        markdownFilter.startTable();
+        visitChildren(node);
+        markdownFilter.endTable();
     }
 
     public void visit(TableRowNode node) {
-    }
-
-    public void visit(VerbatimNode node) {
-    }
-
-    public void visit(WikiLinkNode node) {
-    }
-
-    public void visit(TextNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        visitChildren(node);
     }
 
     public void visit(SuperNode node) {
@@ -197,4 +142,36 @@ class MarkdownSerializer implements Visitor {
         }
     }
 
+    public void visit(Node node) {
+    }
+
+    public void visit(AbbreviationNode node) {
+    }
+
+    public void visit(ReferenceNode node) {
+    }
+
+    public void visit(HtmlBlockNode node) {
+    }
+
+    public void visit(SimpleNode node) {
+    }
+
+    public void visit(VerbatimNode node) {
+    }
+
+    public void visit(WikiLinkNode node) {
+    }
+
+    public void visit(DefinitionListNode node) {
+    }
+
+    public void visit(DefinitionNode node) {
+    }
+
+    public void visit(DefinitionTermNode node) {
+    }
+
+    public void visit(ExpImageNode node) {
+    }
 }

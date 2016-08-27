@@ -45,6 +45,7 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
     private int currentBufPosition;
 
 
+
     public static void loadPlugins() {
         Core.registerFilterClass(MarkdownFilter.class);
     }
@@ -305,7 +306,4 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
         }
         return encoding;
     }
-
-
-
 }
