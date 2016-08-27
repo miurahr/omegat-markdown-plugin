@@ -144,6 +144,7 @@ public abstract class TestFilterBase  {
     protected void translateText(IFilter filter, String filename) throws Exception {
         translateText(filter, filename, Collections.emptyMap());
     }
+
     protected void translateText(IFilter filter, String filename, Map<String, String> config) throws Exception {
         translate(filter, filename, config);
         FileUtils.contentEquals(new File(filename), outFile);

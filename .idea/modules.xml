@@ -2,10 +2,9 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin.iml" group="markdown-plugin" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin_main.iml" filepath="$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin_main.iml" group="markdown-plugin" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin_test.iml" filepath="$PROJECT_DIR$/.idea/modules/markdown-plugin/markdown-plugin_test.iml" group="markdown-plugin" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_main.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_main.iml" group="omegat-markdown-plugin" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_test.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_test.iml" group="omegat-markdown-plugin" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub.iml" group="stub" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub_main.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub_main.iml" group="stub" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub_test.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub_test.iml" group="stub" />

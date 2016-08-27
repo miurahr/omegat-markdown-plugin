@@ -9,8 +9,11 @@
     }
 
     sourceSets {
-        main { compileClasspath += configurations.provided }
-        test
+        main {
+            compileClasspath += configurations.provided
+            test.compileClasspath += configurations.provided
+            test.runtimeClasspath += configurations.provided
+        }
     }
 
     repositories {
@@ -20,9 +23,9 @@
     dependencies {
         compile 'org.pegdown:pegdown:1.6.0'
         provided 'commons-io:commons-io:2.4'
+        provided 'commons-lang:commons-lang:2.6'
         provided project(":stub")
         testCompile 'org.testng:testng:6.9.10'
-        testCompile 'commons-io:commons-io:2.4'
         testCompile project(":stub")
     }
     test.useTestNG()

@@ -2,24 +2,17 @@ package tokyo.northside.omegat;
 
 import org.pegdown.ast.*;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
 import static org.parboiled.common.Preconditions.checkArgNotNull;
-
+import static org.parboiled.common.StringUtils.repeat;
 
 /**
  * Markdown parser and serializer class.
  * Created by miurahr on 16/08/22.
  */
 class MarkdownSerializer implements Visitor {
-    private StringBuilder printer = new StringBuilder();
-    private final Map<String, ReferenceNode> references = new HashMap<>();
-    private MarkdownFilter markdownFilter;
-    private int listOrder;
+    private AbstractMarkdownFilter markdownFilter;
 
-    MarkdownSerializer(MarkdownFilter filter) {
+    MarkdownSerializer(AbstractMarkdownFilter filter) {
         markdownFilter = filter;
     }
 
@@ -45,26 +38,31 @@ class MarkdownSerializer implements Visitor {
 
 
     public void visit(AnchorLinkNode node) {
-        // node.getName()
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(AutoLinkNode node) {
-        // node.getText()
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(BlockQuoteNode node) {
+        visitChildren(node);
     }
 
     public void visit(BulletListNode node) {
+        visitChildren(node);
+    }
 
+    public void visit(OrderedListNode node) {
+        visitChildren(node);
+    }
+
+    public void visit(ListItemNode node) {
+        visitChildren(node);
     }
 
     public void visit(CodeNode node) {
-        try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(DefinitionListNode node) {
@@ -77,62 +75,25 @@ class MarkdownSerializer implements Visitor {
     }
 
     public void visit(ExpImageNode node) {
-        String text = printChildrenToString(node);
-        // node.url
-        // node.title
-
     }
 
     public void visit(ExpLinkNode node) {
+        visitChildren(node);
     }
 
     public void visit(HeaderNode node) {
-        int level = node.getLevel();
-        try {
-            markdownFilter.writeTranslate("<h" + Integer.toString(level) + ">", false);
-        } catch (IOException ioe) {
-            // FIXME
-        }
         visitChildren(node);
-    }
+   }
 
     public void visit(HtmlBlockNode node) {
     }
 
     public void visit(InlineHtmlNode node) {
-         try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
-    }
-
-    public void visit(ListItemNode node) {
-        String markChar = markdownFilter.getChars(node.getStartIndex(), node.getEndIndex());
-        try {
-            markdownFilter.writeTranslate(markChar, false);
-        } catch (IOException ioe) {
-            // FIXME
-        }
-        visitChildren(node);
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(MailLinkNode node) {
-         try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
-    }
-
-    public void visit(OrderedListNode node) {
-        String markChar = markdownFilter.getChars(node.getStartIndex(), node.getEndIndex());
-        try {
-            markdownFilter.writeTranslate(markChar, false);
-        } catch (IOException ioe) {
-            // FIXME
-        }
-        visitChildren(node);
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     /**
@@ -140,11 +101,7 @@ class MarkdownSerializer implements Visitor {
      * @param node
      */
     public void visit(ParaNode node) {
-        try {
-            markdownFilter.writeTranslate(node.getStartIndex(), node.getEndIndex(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        visitChildren(node);
     }
 
     /**
@@ -152,45 +109,22 @@ class MarkdownSerializer implements Visitor {
      * @param node
      */
     public void visit(QuotedNode node) {
-        switch (node.getType()) {
-            case DoubleAngle:
-                printer.append("&laquo;");
-                visitChildren(node);
-                printer.append("&raquo;");
-                break;
-            case Double:
-                printer.append("&ldquo;");
-                visitChildren(node);
-                printer.append("&rdquo;");
-                break;
-            case Single:
-                printer.append("&lsquo;");
-                visitChildren(node);
-                printer.append("&rsquo;");
-                break;
-        }
-        System.out.println(printer.toString());
+        visitChildren(node);
     }
 
     public void visit(RefImageNode node) {
-
+        // fixme
     }
 
     public void visit(RefLinkNode node) {
-        String text = printChildrenToString(node);
-        String key = node.referenceKey != null ? printChildrenToString(node.referenceKey) : text;
-        ReferenceNode refNode = references.get(key);
-        // TODO: handle refNode
-         try {
-            markdownFilter.writeTranslate(text, true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        // fixme
+        visitChildren(node);
     }
 
     public void visit(SimpleNode node) {
-        switch(node.getType()) {
+        switch (node.getType()) {
             case Apostrophe:
+                markdownFilter.writeTranslate("'", false);
                 break;
             case Ellipsis:
                 break;
@@ -210,92 +144,46 @@ class MarkdownSerializer implements Visitor {
     }
 
     public void visit(SpecialTextNode node) {
-         try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(StrikeNode node) {
-        if (node.isClosed())
-            return;
-        try {
-            if (node.isStrong()) {
-                markdownFilter.writeTranslate("**", false);
-                visitChildren(node);
-                markdownFilter.writeTranslate("**", false);
-            } else {
-                markdownFilter.writeTranslate("__", false);
-                visitChildren(node);
-                markdownFilter.writeTranslate("__", false);
-            }
-        } catch (IOException ioe) {
-            // FIXME
-        }
-          System.out.print("StrikeNode: ");
-         System.out.println(node.getChars());
+        visitChildren(node);
     }
 
     public void visit(StrongEmphSuperNode node) {
-        if (node.isClosed())
-            return;
-
-        try {
-            if (node.isStrong()) {
-                markdownFilter.writeTranslate("**", false);
-                visitChildren(node);
-                markdownFilter.writeTranslate("**", false);
-            } else {
-                markdownFilter.writeTranslate("__", false);
-                visitChildren(node);
-                markdownFilter.writeTranslate("__", false);
-            }
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        visitChildren(node);
     }
 
     public void visit(TableBodyNode node) {
-
     }
 
     public void visit(TableCaptionNode node) {
-
     }
 
     public void visit(TableCellNode node) {
-
     }
+
     public void visit(TableColumnNode node) {
-
     }
+
     public void visit(TableHeaderNode node) {
-
     }
+
     public void visit(TableNode node) {
-
     }
+
     public void visit(TableRowNode node) {
-
     }
+
     public void visit(VerbatimNode node) {
-
     }
+
     public void visit(WikiLinkNode node) {
-        try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
     }
 
     public void visit(TextNode node) {
-        try {
-            markdownFilter.writeTranslate(node.getText(), true);
-        } catch (IOException ioe) {
-            // FIXME
-        }
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
     public void visit(SuperNode node) {
@@ -303,18 +191,10 @@ class MarkdownSerializer implements Visitor {
     }
 
     // helpers
-    protected void visitChildren(SuperNode node) {
+    private void visitChildren(SuperNode node) {
         for (Node child : node.getChildren()) {
             child.accept(this);
         }
     }
 
-    protected String printChildrenToString(SuperNode node) {
-        StringBuilder priorPrinter = printer;
-        printer = new StringBuilder();
-        visitChildren(node);
-        String result = printer.toString();
-        printer = priorPrinter;
-        return result;
-    }
 }

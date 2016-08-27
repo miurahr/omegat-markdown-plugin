@@ -8,7 +8,6 @@ import java.util.Map;
 import org.apache.commons.io.IOUtils;
 import org.omegat.core.Core;
 import org.omegat.filters2.*;
-import org.omegat.util.NullBufferedWriter;
 
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
@@ -19,7 +18,7 @@ import org.pegdown.ast.RootNode;
  *
  * @author Hiroshi Miura
  */
-public class MarkdownFilter implements IFilter {
+public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
 
     /**
      * Callback for parse.
@@ -43,9 +42,8 @@ public class MarkdownFilter implements IFilter {
 
     protected String inEncodingLastParsedFile;
 
-    private BufferedWriter outfile;
+    private int currentBufPosition;
 
-    private char[] articleBuf;
 
     public static void loadPlugins() {
         Core.registerFilterClass(MarkdownFilter.class);
@@ -228,43 +226,44 @@ public class MarkdownFilter implements IFilter {
         }
     }
 
-    private void processFile(File infile, File outfile, FilterContext fc) throws IOException {
+    private void processFile(File infile, File outFile, FilterContext fc) throws IOException {
         this.articleBuf = IOUtils.toCharArray(new BufferedReader(new FileReader(infile)));
-        if (outfile != null) {
-            String outEncoding = getOutputEncoding(fc);
-            if (outEncoding == null) {
-                this.outfile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outfile)));
-            } else {
-                this.outfile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outfile), outEncoding));
-            }
-        } else {
-            this.outfile = new NullBufferedWriter();
-        }
+        this.outbuf = new StringBuilder();
         MarkdownSerializer serializer = new MarkdownSerializer(this);
         PegDownProcessor processor = new PegDownProcessor();
         RootNode astRoot = processor.parseMarkdown(articleBuf);
         serializer.processNodes(astRoot);
+         if (outFile != null) {
+            BufferedWriter outfile;
+            String outEncoding = getOutputEncoding(fc);
+            if (outEncoding == null) {
+                outfile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile)));
+            } else {
+                outfile = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), outEncoding));
+            }
+            outfile.write(outbuf.toString());
+            outfile.flush();
+            outfile.close();
+        }
+   }
+
+    @Override
+    void writeTranslate(final String text, final int start, final int end) {
+        char[] buf = new char[start - currentBufPosition];
+        System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
+        writeTranslate(String.valueOf(buf), false);
+        currentBufPosition = end;
+        writeTranslate(text, true);
     }
 
-
-    void writeTranslate(String text, boolean trans) throws IOException {
-        writeTranslate(outfile, text, trans);
-    }
-
-    void writeTranslate(final int start, final int end, boolean trans) throws IOException {
-        char[] buf = new char[end - start];
-        System.arraycopy(articleBuf, start, buf, 0, end - start);
-        writeTranslate(outfile, String.valueOf(buf), trans);
-    }
-
-    private void writeTranslate(BufferedWriter outfile, String value, boolean trans) throws IOException {
-        value = value.trim();
+    @Override
+    void writeTranslate(String value, boolean trans) {
         if (!value.isEmpty()) {
             if (trans) {
                 String translated = processEntry(value, null);
-                outfile.write(translated);
+                outbuf.append(translated);
             } else {
-                outfile.write(value);
+                outbuf.append(value);
             }
         }
     }
@@ -306,4 +305,7 @@ public class MarkdownFilter implements IFilter {
         }
         return encoding;
     }
+
+
+
 }
