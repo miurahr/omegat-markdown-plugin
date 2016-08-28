@@ -27,11 +27,11 @@ abstract class AbstractMarkdownFilter {
     }
 
 
-    public void startTable() {
+    void startTable() {
         tableMode = true;
     }
 
-    public void endTable() {
+    void endTable() {
         tableMode = false;
     }
 
