@@ -251,11 +251,16 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
 
     @Override
     void writeTranslate(final String text, final int start, final int end) {
-        char[] buf = new char[start - currentBufPosition];
-        System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-        writeTranslate(String.valueOf(buf), false);
-        currentBufPosition = end;
-        writeTranslate(text, true);
+        if (start - currentBufPosition > 0) {
+            char[] buf = new char[start - currentBufPosition];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
+            writeTranslate(String.valueOf(buf), false);
+            currentBufPosition = end;
+            writeTranslate(text, true);
+        } else if (start - currentBufPosition == 0) {
+            currentBufPosition = end;
+            writeTranslate(text, true);
+        }
     }
 
     @Override
