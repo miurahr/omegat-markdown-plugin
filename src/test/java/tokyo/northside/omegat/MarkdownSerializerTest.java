@@ -16,7 +16,7 @@ import static org.testng.Assert.*;
  */
 public class MarkdownSerializerTest {
 
-    class MockFilter extends AbstractMarkdownFilter {
+    class MockFilter extends MarkdownFilterBase {
         private int currentBufPosition = 0;
         private List<String> entries = new ArrayList<>();
 

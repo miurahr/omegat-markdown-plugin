@@ -18,7 +18,7 @@ import org.pegdown.ast.RootNode;
  *
  * @author Hiroshi Miura
  */
-public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
+public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter {
 
     /**
      * Callback for parse.
@@ -47,7 +47,7 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
 
 
     public static void loadPlugins() {
-        Core.registerFilterClass(MarkdownFilter.class);
+        Core.registerFilterClass(OmegatMarkdownFilter.class);
     }
 
     public static void unloadPlugins() {
@@ -56,7 +56,7 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
     /**
      * Creates a new instance.
      */
-    public MarkdownFilter() {
+    public OmegatMarkdownFilter() {
         super();
     }
 

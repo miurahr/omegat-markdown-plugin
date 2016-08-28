@@ -3,7 +3,7 @@ package tokyo.northside.omegat;
 /**
  * Created by miurahr on 16/08/26.
  */
-abstract class AbstractMarkdownFilter {
+abstract class MarkdownFilterBase {
     protected StringBuilder outbuf;
     protected char[] articleBuf;
     protected boolean tableMode = false;
@@ -34,5 +34,4 @@ abstract class AbstractMarkdownFilter {
     void endTable() {
         tableMode = false;
     }
-
 }

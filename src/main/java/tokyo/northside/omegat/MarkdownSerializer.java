@@ -9,9 +9,9 @@ import static org.parboiled.common.Preconditions.checkArgNotNull;
  * Created by miurahr on 16/08/22.
  */
 class MarkdownSerializer implements Visitor {
-    private AbstractMarkdownFilter markdownFilter;
+    private MarkdownFilterBase markdownFilter;
 
-    MarkdownSerializer(AbstractMarkdownFilter filter) {
+    MarkdownSerializer(MarkdownFilterBase filter) {
         markdownFilter = filter;
     }
 
@@ -101,6 +101,14 @@ class MarkdownSerializer implements Visitor {
     }
 
     /**
+     * Start paragraph, also to start entry.
+     * @param node
+     */
+    public void visit(ParaNode node) {
+        visitChildren(node);
+    }
+
+    /**
      * Accept other nodes which should visit children.
      * @param node super node.
      */
@@ -125,10 +133,6 @@ class MarkdownSerializer implements Visitor {
     }
 
     public void visit(HeaderNode node) {
-        visitChildren(node);
-    }
-
-    public void visit(ParaNode node) {
         visitChildren(node);
     }
 
