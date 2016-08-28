@@ -90,6 +90,18 @@ class MarkdownSerializer implements Visitor {
         markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
+    public void visit(HtmlBlockNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    /**
+     * Accept verbatim node.
+     * @param node verbatim node.
+     */
+    public void visit(VerbatimNode node) {
+        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
     /**
      * Accept table node.
      * @param node table node.
@@ -199,11 +211,7 @@ class MarkdownSerializer implements Visitor {
 
     public void visit(ReferenceNode node) {}
 
-    public void visit(HtmlBlockNode node) {}
-
     public void visit(SimpleNode node) {}
-
-    public void visit(VerbatimNode node) {}
 
     public void visit(WikiLinkNode node) {}
 
