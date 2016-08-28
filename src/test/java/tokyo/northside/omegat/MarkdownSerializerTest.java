@@ -32,6 +32,17 @@ public class MarkdownSerializerTest extends AbstractMarkdownFilter {
         outbuf.append(text);
     }
 
+    @Override
+    void flushToEof() {
+        int restSize = articleBuf.length - currentBufPosition;
+        if (restSize > 0) {
+             char[] buf = new char[restSize];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
+            writeTranslate(String.valueOf(buf), false);
+            currentBufPosition += restSize;
+        }
+    }
+
     private void process(String testInput) throws Exception {
         resetOutbuf();
         articleBuf = testInput.toCharArray();

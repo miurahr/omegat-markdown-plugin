@@ -234,6 +234,7 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
         PegDownProcessor processor = new PegDownProcessor();
         RootNode astRoot = processor.parseMarkdown(articleBuf);
         serializer.processNodes(astRoot);
+        flushToEof();
          if (outFile != null) {
             BufferedWriter outfile;
             String outEncoding = getOutputEncoding(fc);
@@ -266,6 +267,17 @@ public class MarkdownFilter extends AbstractMarkdownFilter implements IFilter {
             } else {
                 outbuf.append(value);
             }
+        }
+    }
+
+    @Override
+    void flushToEof() {
+        int restSize = articleBuf.length - currentBufPosition;
+        if (restSize > 0) {
+            char[] buf = new char[restSize];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
+            writeTranslate(String.valueOf(buf), false);
+            currentBufPosition += restSize;
         }
     }
 

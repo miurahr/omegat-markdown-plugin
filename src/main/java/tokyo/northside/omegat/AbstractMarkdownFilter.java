@@ -10,6 +10,7 @@ abstract class AbstractMarkdownFilter {
 
     abstract void writeTranslate(final String text, final boolean trans);
     abstract void writeTranslate(final String text, final int start, final int end);
+    abstract void flushToEof();
 
     /**
      * Reset buffer for Test.
