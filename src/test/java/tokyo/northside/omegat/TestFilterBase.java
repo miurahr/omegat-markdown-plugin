@@ -50,34 +50,8 @@ public abstract class TestFilterBase  {
 
     protected File outFile;
 
-    protected List<String> parse(IFilter filter, String filename) throws Exception {
-        final List<String> result = new ArrayList<>();
-
-        filter.parseFile(new File(filename), Collections.emptyMap(), context, new IParseCallback() {
-            public void addEntry(String id, String source, String translation, boolean isFuzzy,
-                    String comment, IFilter filter) {
-                addEntry(id, source, translation, isFuzzy, comment, null, filter, null);
-            }
-
-            public void addEntry(String id, String source, String translation, boolean isFuzzy, String comment,
-                                 String path, IFilter filter, List<ProtectedPart> protectedParts) {
-                String[] props = comment == null ? null : new String[] { "comment", comment };
-                addEntryWithProperties(id, source, translation, isFuzzy, props, path, filter, protectedParts);
-            }
-
-            public void addEntryWithProperties(String id, String source, String translation,
-                                               boolean isFuzzy, String[] props, String path,
-                                               IFilter filter, List<ProtectedPart> protectedParts) {
-                if (!source.isEmpty()) {
-                    result.add(source);
-                }
-            }
-
-            public void linkPrevNextSegments() {
-            }
-        });
-
-        return result;
+    protected List<String> parse(IFilter filter, String resource) throws Exception {
+        return parse(filter, resource, Collections.emptyMap());
     }
 
     protected List<String> parse(IFilter filter, String resource, Map<String, String> options)
@@ -112,12 +86,14 @@ public abstract class TestFilterBase  {
     }
 
 
-    protected void translate(IFilter filter, String filename) throws Exception {
-        translate(filter, filename, Collections.emptyMap());
+    protected void translate(IFilter filter, String resource) throws Exception {
+        translate(filter, resource, Collections.emptyMap());
     }
     
-    protected void translate(IFilter filter, String filename, Map<String, String> config) throws Exception {
-        filter.translateFile(new File(filename), outFile, config, context,
+    protected void translate(IFilter filter, String resource, Map<String, String> config) throws Exception {
+        outFile = File.createTempFile("output", ".md");
+        outFile.deleteOnExit();
+        filter.translateFile(new File(this.getClass().getResource(resource).getFile()), outFile, config, context,
                 new ITranslateCallback() {
                     public String getTranslation(String id, String source, String path) {
                         return source;
@@ -145,9 +121,9 @@ public abstract class TestFilterBase  {
         translateText(filter, filename, Collections.emptyMap());
     }
 
-    protected void translateText(IFilter filter, String filename, Map<String, String> config) throws Exception {
-        translate(filter, filename, config);
-        FileUtils.contentEquals(new File(filename), outFile);
+    protected void translateText(IFilter filter, String resource, Map<String, String> config) throws Exception {
+        translate(filter, resource, config);
+        FileUtils.contentEquals(new File(this.getClass().getResource(resource).getFile()), outFile);
     }
 
 }

@@ -1,3 +1,0 @@
-# HEADING
-
-Clauses. Clauses.

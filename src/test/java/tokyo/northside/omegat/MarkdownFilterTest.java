@@ -44,7 +44,7 @@ class MarkdownFilterTest extends TestFilterBase {
     @Test
     void testIsFileSupported_true() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
-        File target = new File(this.getClass().getResource("/test.md").getFile());
+        File target = new File(this.getClass().getResource("/source/case0.md").getFile());
         FilterContext fc = new FilterContext();
         assertTrue(mdf.isFileSupported(target, null, fc));
     }
@@ -52,16 +52,20 @@ class MarkdownFilterTest extends TestFilterBase {
     @Test
     void testIsFileSupported_false() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
-        File target = new File(this.getClass().getResource("/nomarkdown.txt").getFile());
+        File target = new File(this.getClass().getResource("/source/nomarkdown.txt").getFile());
         FilterContext fc = new FilterContext();
         assertFalse(mdf.isFileSupported(target, null, fc));
     }
 
     @Test
-    void testProcessFile_case1() throws Exception {
+    void testProcess_case1() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
-        Map<String, String> options = new HashMap<>(64);
-        List<String> entries = parse(mdf, "/source/case1.md", options);
+        List<String> entries = parse(mdf, "/source/case1.md");
+    }
 
+    @Test
+    void testTranslate_case1() throws Exception {
+        MarkdownFilter mdf = new MarkdownFilter();
+        translateText(mdf, "/source/case1.md");
     }
 }
