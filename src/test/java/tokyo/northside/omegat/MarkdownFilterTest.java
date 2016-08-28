@@ -58,15 +58,10 @@ class MarkdownFilterTest extends TestFilterBase {
     }
 
     @Test
-    void testProcessFile() throws Exception {
+    void testProcessFile_case1() throws Exception {
         MarkdownFilter mdf = new MarkdownFilter();
         Map<String, String> options = new HashMap<>(64);
-        List<String> entries = parse(mdf, "/complex.md", options);
-        assertNotNull(entries);
-        assertNotEquals(entries.size(), 0);
-        for (String en: entries) {
-            System.out.print("test: ");
-            System.out.println(en);
-        }
+        List<String> entries = parse(mdf, "/source/case1.md", options);
+
     }
 }
