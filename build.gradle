@@ -79,7 +79,7 @@ distTar {
 distributions {
     main {
         contents {
-            from('README.md')
+            from('README.md', 'CHANGELOG.md', 'COPYING', 'DEVELOP.md')
             from(sourceJar) {
                 into 'source'
             }
