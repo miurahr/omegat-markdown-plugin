@@ -18,7 +18,7 @@ import org.pegdown.ast.RootNode;
  *
  * @author Hiroshi Miura
  */
-public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter {
+public class OmegatMarkdownFilter implements IFilter {
 
     /**
      * Callback for parse.
@@ -42,9 +42,10 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
 
     protected String inEncodingLastParsedFile;
 
+    protected StringBuilder outbuf;
+
+    protected char[] articleBuf;
     private int currentBufPosition;
-
-
 
     public static void loadPlugins() {
         Core.registerFilterClass(OmegatMarkdownFilter.class);
@@ -230,7 +231,8 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
     private void processFile(File infile, File outFile, FilterContext fc) throws IOException {
         this.articleBuf = IOUtils.toCharArray(new BufferedReader(new FileReader(infile)));
         this.outbuf = new StringBuilder();
-        MarkdownSerializer serializer = new MarkdownSerializer(this);
+        EntryHandler handler = new EntryHandler(this);
+        MarkdownSerializer serializer = new MarkdownSerializer(handler);
         PegDownProcessor processor = new PegDownProcessor();
         RootNode astRoot = processor.parseMarkdown(articleBuf);
         serializer.processNodes(astRoot);
@@ -249,44 +251,8 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
         }
    }
 
-    @Override
-    void writeTranslate(final String text, final int start, final int end) {
-        if (start - currentBufPosition > 0) {
-            char[] buf = new char[start - currentBufPosition];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        } else if (start - currentBufPosition == 0) {
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        }
-    }
 
-    @Override
-    void writeTranslate(String value, boolean trans) {
-        if (!value.isEmpty()) {
-            if (trans) {
-                String translated = processEntry(value, null);
-                outbuf.append(translated);
-            } else {
-                outbuf.append(value);
-            }
-        }
-    }
-
-    @Override
-    void flushToEof() {
-        int restSize = articleBuf.length - currentBufPosition;
-        if (restSize > 0) {
-            char[] buf = new char[restSize];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition += restSize;
-        }
-    }
-
-    private String processEntry(String entry, String comment) {
+    String processEntry(String entry, String comment) {
         if (entryParseCallback != null) {
             entryParseCallback.addEntry(null, entry, null, false, comment, null, this, null);
             return entry;
@@ -322,5 +288,51 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
             }
         }
         return encoding;
+    }
+
+    void writeTranslate(final String text, final int start, final int end) {
+        if (start - currentBufPosition > 0) {
+            char[] buf = new char[start - currentBufPosition];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
+            writeTranslate(String.valueOf(buf), false);
+            currentBufPosition = end;
+            writeTranslate(text, true);
+        } else if (start - currentBufPosition == 0) {
+            currentBufPosition = end;
+            writeTranslate(text, true);
+        }
+    }
+
+    void writeTranslate(String value, boolean trans) {
+        if (!value.isEmpty()) {
+            if (trans) {
+                String translated = processEntry(value, null);
+                outbuf.append(translated);
+            } else {
+                outbuf.append(value);
+            }
+        }
+    }
+    void flushToEof() {
+        int restSize = articleBuf.length - currentBufPosition;
+        if (restSize > 0) {
+            char[] buf = new char[restSize];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
+            writeTranslate(String.valueOf(buf), false);
+            currentBufPosition += restSize;
+        }
+    }
+    /**
+     * Reset buffer for Test.
+     */
+    void resetOutbuf() {
+        outbuf = new StringBuilder();
+    }
+
+    /**
+     * Get buffer contents for Test.
+     */
+    String getOutbuf() {
+        return outbuf.toString();
     }
 }

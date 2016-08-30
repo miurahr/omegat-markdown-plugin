@@ -16,24 +16,19 @@ import static org.testng.Assert.*;
  */
 public class MarkdownSerializerTest {
 
-    class MockFilter extends MarkdownFilterBase {
-        private int currentBufPosition = 0;
+    class MockFilter extends OmegatMarkdownFilter {
+        private EntryHandler handler;
         private List<String> entries = new ArrayList<>();
 
-        @Override
-        void writeTranslate(final String text, final int start, final int end) {
-            if (start - currentBufPosition > 0) {
-                char[] buf = new char[start - currentBufPosition];
-                System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-                writeTranslate(String.valueOf(buf), false);
-                currentBufPosition = end;
-                writeTranslate(text, true);
-            } else if (start - currentBufPosition == 0) {
-                currentBufPosition = end;
-                writeTranslate(text, true);
-            }
-        }
-
+        /**
+         * Mock for writeTranslate()
+         * <p>
+         * Store to local variable instead of writing file.
+         * It don't call translation.
+         *
+         * @param text entry text
+         * @param trans entry to be translated.
+         */
         @Override
         void writeTranslate(final String text, final boolean trans) {
             if (trans) {
@@ -42,33 +37,21 @@ public class MarkdownSerializerTest {
             outbuf.append(text);
         }
 
-        @Override
-        void flushToEof() {
-            int restSize = articleBuf.length - currentBufPosition;
-            if (restSize > 0) {
-                char[] buf = new char[restSize];
-                System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
-                writeTranslate(String.valueOf(buf), false);
-                currentBufPosition += restSize;
-            }
-        }
-
-        void resetEntries() {
-            entries = new ArrayList<>();
-        }
-
-        List<String> getEntries() {
-            return entries;
-        }
-
+        /** process test */
         void process(String testInput) throws Exception {
             resetOutbuf();
             articleBuf = testInput.toCharArray();
-            MarkdownSerializer serializer = new MarkdownSerializer(this);
+            handler = new EntryHandler(this);
+            MarkdownSerializer serializer = new MarkdownSerializer(handler);
             PegDownProcessor processor = new PegDownProcessor();
             RootNode astRoot = processor.parseMarkdown(articleBuf);
             serializer.processNodes(astRoot);
             flushToEof();
+        }
+
+        /** for test */
+        List<String> getEntries() {
+            return entries;
         }
     }
 
@@ -146,8 +129,7 @@ public class MarkdownSerializerTest {
         expected.add("unordered list (3)\n" + "continuous line.");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
-        throw new SkipException("Skipping entry test.");
-        //assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getEntries(), expected);
     }
 
     @Test
