@@ -1,4 +1,4 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import java.awt.*;
 import java.io.*;
@@ -23,29 +23,27 @@ public class OmegatMarkdownFilter implements IFilter {
     /**
      * Callback for parse.
      */
-    protected IParseCallback entryParseCallback;
+    private IParseCallback entryParseCallback;
 
     /**
      * Callback for translate.
      */
-    protected ITranslateCallback entryTranslateCallback;
+    private ITranslateCallback entryTranslateCallback;
 
     /**
      * Callback for align.
      */
-    protected IAlignCallback entryAlignCallback;
+    private IAlignCallback entryAlignCallback;
 
     /**
      * Options for processing time.
      */
-    protected Map<String, String> processOptions;
+    private Map<String, String> processOptions;
 
-    protected String inEncodingLastParsedFile;
+    private String inEncodingLastParsedFile;
 
-    protected StringBuilder outbuf;
+    private StringBuilder outbuf;
 
-    protected char[] articleBuf;
-    private int currentBufPosition;
 
     public static void loadPlugins() {
         Core.registerFilterClass(OmegatMarkdownFilter.class);
@@ -177,12 +175,6 @@ public class OmegatMarkdownFilter implements IFilter {
                 .orElse(0);
     }
 
-    public String getChars(final int start, final int end) {
-        char[] buf = new char[end - start];
-        System.arraycopy(articleBuf, start, buf, 0, end - start);
-        return String.valueOf(buf);
-    }
-
     public final void parseFile(File inFile, Map<String, String> config, FilterContext fc,
                                 IParseCallback callback) throws Exception {
         entryParseCallback = callback;
@@ -228,16 +220,10 @@ public class OmegatMarkdownFilter implements IFilter {
         }
     }
 
-    private void processFile(File infile, File outFile, FilterContext fc) throws IOException {
-        this.articleBuf = IOUtils.toCharArray(new BufferedReader(new FileReader(infile)));
-        this.outbuf = new StringBuilder();
-        EntryHandler handler = new EntryHandler(this);
-        MarkdownSerializer serializer = new MarkdownSerializer(handler);
-        PegDownProcessor processor = new PegDownProcessor();
-        RootNode astRoot = processor.parseMarkdown(articleBuf);
-        serializer.processNodes(astRoot);
-        flushToEof();
-         if (outFile != null) {
+    void processFile(File infile, File outFile, FilterContext fc) throws IOException {
+        inEncodingLastParsedFile = "UTF-8";
+        process(new BufferedReader(new FileReader(infile)));
+        if (outFile != null) {
             BufferedWriter outfile;
             String outEncoding = getOutputEncoding(fc);
             if (outEncoding == null) {
@@ -251,6 +237,25 @@ public class OmegatMarkdownFilter implements IFilter {
         }
    }
 
+    void process(BufferedReader reader) throws IOException {
+        resetOutbuf();
+        EntryHandler handler = new EntryHandler(this, IOUtils.toCharArray(reader));
+        MarkdownSerializer serializer = new MarkdownSerializer(handler);
+        PegDownProcessor processor = new PegDownProcessor();
+        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
+        serializer.processNodes(astRoot);
+        handler.finish();
+    }
+
+    void process(String testInput) throws Exception {
+        resetOutbuf();
+        EntryHandler handler = new EntryHandler(this, testInput.toCharArray());
+        MarkdownSerializer serializer = new MarkdownSerializer(handler);
+        PegDownProcessor processor = new PegDownProcessor();
+        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
+        serializer.processNodes(astRoot);
+        handler.finish();
+    }
 
     String processEntry(String entry, String comment) {
         if (entryParseCallback != null) {
@@ -290,19 +295,6 @@ public class OmegatMarkdownFilter implements IFilter {
         return encoding;
     }
 
-    void writeTranslate(final String text, final int start, final int end) {
-        if (start - currentBufPosition > 0) {
-            char[] buf = new char[start - currentBufPosition];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        } else if (start - currentBufPosition == 0) {
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        }
-    }
-
     void writeTranslate(String value, boolean trans) {
         if (!value.isEmpty()) {
             if (trans) {
@@ -313,16 +305,8 @@ public class OmegatMarkdownFilter implements IFilter {
             }
         }
     }
-    void flushToEof() {
-        int restSize = articleBuf.length - currentBufPosition;
-        if (restSize > 0) {
-            char[] buf = new char[restSize];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition += restSize;
-        }
-    }
-    /**
+
+   /**
      * Reset buffer for Test.
      */
     void resetOutbuf() {
@@ -334,5 +318,11 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     String getOutbuf() {
         return outbuf.toString();
+    }
+    /**
+     * Append to buffer for test.
+     */
+    void appendOutbuf(String text) {
+        outbuf.append(text);
     }
 }

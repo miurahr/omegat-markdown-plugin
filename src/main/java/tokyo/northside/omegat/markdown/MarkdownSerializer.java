@@ -1,4 +1,4 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import org.pegdown.ast.*;
 
@@ -6,7 +6,7 @@ import static org.parboiled.common.Preconditions.checkArgNotNull;
 
 /**
  * Markdown parser and serializer class.
- * Created by miurahr on 16/08/22.
+ * @author Hiroshi Miura
  */
 class MarkdownSerializer implements Visitor {
     private EntryHandler handler;

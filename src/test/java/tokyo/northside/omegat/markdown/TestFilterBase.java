@@ -23,7 +23,7 @@
  along with this program.  If not, see <http://www.gnu.org/licenses/>.
  **************************************************************************/
 
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import org.omegat.core.data.ProtectedPart;
 import org.omegat.filters2.FilterContext;

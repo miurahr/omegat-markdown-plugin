@@ -1,8 +1,7 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -17,7 +16,6 @@ import static org.testng.Assert.*;
 public class MarkdownSerializerTest {
 
     class MockFilter extends OmegatMarkdownFilter {
-        private EntryHandler handler;
         private List<String> entries = new ArrayList<>();
 
         /**
@@ -34,19 +32,7 @@ public class MarkdownSerializerTest {
             if (trans) {
                 entries.add(text);
             }
-            outbuf.append(text);
-        }
-
-        /** process test */
-        void process(String testInput) throws Exception {
-            resetOutbuf();
-            articleBuf = testInput.toCharArray();
-            handler = new EntryHandler(this);
-            MarkdownSerializer serializer = new MarkdownSerializer(handler);
-            PegDownProcessor processor = new PegDownProcessor();
-            RootNode astRoot = processor.parseMarkdown(articleBuf);
-            serializer.processNodes(astRoot);
-            handler.finish();
+            appendOutbuf(text);
         }
 
         /** for test */
