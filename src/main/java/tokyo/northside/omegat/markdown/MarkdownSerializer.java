@@ -154,7 +154,9 @@ class MarkdownSerializer implements Visitor {
      * @param node paragraph node.
      */
     public void visit(final ParaNode node) {
+        handler.startPara();
         visitChildren(node);
+        handler.endPara();
     }
 
     /**

@@ -14,30 +14,67 @@ class EntryHandler {
     private char[] articleBuf;
     private int currentBufPosition;
 
+    private StringBuilder entryBuf;
+    private int para;
+
     EntryHandler(final OmegatMarkdownFilter filter, final char[] article) {
         this.filter = filter;
+
         articleBuf = article;
         currentBufPosition = 0;
+
+        entryBuf = new StringBuilder();
+        para = 0;
     }
 
     char[] getArticle() {
         return articleBuf;
     }
 
-    void putEntry(final TextNode node) {
-        this.putEntry(node.getText(), node.getStartIndex(), node.getEndIndex());
+    private void resetEntryBuf() {
+        entryBuf = new StringBuilder();
+        para = 0;
     }
 
-    void putEntry(final String text, final int start, final int end) {
+    /**
+     * Convenient function to call from Serializer.
+     * @param node PegDown's TextNode node.
+     */
+    void putEntry(final TextNode node) {
+        putEntry(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    void startPara() {
+        para++;
+    }
+
+    void endPara() {
+        para--;
+        if (para <= 0) {
+            filter.writeTranslate(entryBuf.toString(), true);
+            resetEntryBuf();
+        }
+    }
+
+    private void putEntry(final String text, final int start, final int end) {
         if (start - currentBufPosition > 0) {
             char[] buf = new char[start - currentBufPosition];
             System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-            filter.writeTranslate(String.valueOf(buf), false);
+            String token = String.valueOf(buf);
+            if (para > 0) {
+                entryBuf.append(text);
+            } else {
+                filter.writeTranslate(token, false);
+                filter.writeTranslate(text, true);
+            }
             currentBufPosition = end;
-            filter.writeTranslate(text, true);
         } else if (start - currentBufPosition == 0) {
             currentBufPosition = end;
-            filter.writeTranslate(text, true);
+            if (para > 0) {
+                entryBuf.append(text);
+            } else {
+                filter.writeTranslate(text, true);
+            }
         }
     }
 
@@ -49,6 +86,5 @@ class EntryHandler {
             filter.writeTranslate(String.valueOf(buf), false);
             currentBufPosition += restSize;
         }
-
     }
 }
