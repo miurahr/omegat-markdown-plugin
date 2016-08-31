@@ -1,4 +1,4 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import java.awt.*;
 import java.io.*;
@@ -18,32 +18,31 @@ import org.pegdown.ast.RootNode;
  *
  * @author Hiroshi Miura
  */
-public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter {
+public class OmegatMarkdownFilter implements IFilter {
 
     /**
      * Callback for parse.
      */
-    protected IParseCallback entryParseCallback;
+    private IParseCallback entryParseCallback;
 
     /**
      * Callback for translate.
      */
-    protected ITranslateCallback entryTranslateCallback;
+    private ITranslateCallback entryTranslateCallback;
 
     /**
      * Callback for align.
      */
-    protected IAlignCallback entryAlignCallback;
+    private IAlignCallback entryAlignCallback;
 
     /**
      * Options for processing time.
      */
-    protected Map<String, String> processOptions;
+    private Map<String, String> processOptions;
 
-    protected String inEncodingLastParsedFile;
+    private String inEncodingLastParsedFile;
 
-    private int currentBufPosition;
-
+    private StringBuilder outbuf;
 
 
     public static void loadPlugins() {
@@ -176,12 +175,6 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
                 .orElse(0);
     }
 
-    public String getChars(final int start, final int end) {
-        char[] buf = new char[end - start];
-        System.arraycopy(articleBuf, start, buf, 0, end - start);
-        return String.valueOf(buf);
-    }
-
     public final void parseFile(File inFile, Map<String, String> config, FilterContext fc,
                                 IParseCallback callback) throws Exception {
         entryParseCallback = callback;
@@ -227,15 +220,10 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
         }
     }
 
-    private void processFile(File infile, File outFile, FilterContext fc) throws IOException {
-        this.articleBuf = IOUtils.toCharArray(new BufferedReader(new FileReader(infile)));
-        this.outbuf = new StringBuilder();
-        MarkdownSerializer serializer = new MarkdownSerializer(this);
-        PegDownProcessor processor = new PegDownProcessor();
-        RootNode astRoot = processor.parseMarkdown(articleBuf);
-        serializer.processNodes(astRoot);
-        flushToEof();
-         if (outFile != null) {
+    void processFile(File infile, File outFile, FilterContext fc) throws IOException {
+        inEncodingLastParsedFile = "UTF-8";
+        process(new BufferedReader(new FileReader(infile)));
+        if (outFile != null) {
             BufferedWriter outfile;
             String outEncoding = getOutputEncoding(fc);
             if (outEncoding == null) {
@@ -249,44 +237,27 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
         }
    }
 
-    @Override
-    void writeTranslate(final String text, final int start, final int end) {
-        if (start - currentBufPosition > 0) {
-            char[] buf = new char[start - currentBufPosition];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        } else if (start - currentBufPosition == 0) {
-            currentBufPosition = end;
-            writeTranslate(text, true);
-        }
+    void process(BufferedReader reader) throws IOException {
+        resetOutbuf();
+        EntryHandler handler = new EntryHandler(this, IOUtils.toCharArray(reader));
+        MarkdownSerializer serializer = new MarkdownSerializer(handler);
+        PegDownProcessor processor = new PegDownProcessor();
+        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
+        serializer.processNodes(astRoot);
+        handler.finish();
     }
 
-    @Override
-    void writeTranslate(String value, boolean trans) {
-        if (!value.isEmpty()) {
-            if (trans) {
-                String translated = processEntry(value, null);
-                outbuf.append(translated);
-            } else {
-                outbuf.append(value);
-            }
-        }
+    void process(String testInput) throws Exception {
+        resetOutbuf();
+        EntryHandler handler = new EntryHandler(this, testInput.toCharArray());
+        MarkdownSerializer serializer = new MarkdownSerializer(handler);
+        PegDownProcessor processor = new PegDownProcessor();
+        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
+        serializer.processNodes(astRoot);
+        handler.finish();
     }
 
-    @Override
-    void flushToEof() {
-        int restSize = articleBuf.length - currentBufPosition;
-        if (restSize > 0) {
-            char[] buf = new char[restSize];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, restSize);
-            writeTranslate(String.valueOf(buf), false);
-            currentBufPosition += restSize;
-        }
-    }
-
-    private String processEntry(String entry, String comment) {
+    String processEntry(String entry, String comment) {
         if (entryParseCallback != null) {
             entryParseCallback.addEntry(null, entry, null, false, comment, null, this, null);
             return entry;
@@ -322,5 +293,36 @@ public class OmegatMarkdownFilter extends MarkdownFilterBase implements IFilter 
             }
         }
         return encoding;
+    }
+
+    void writeTranslate(String value, boolean trans) {
+        if (!value.isEmpty()) {
+            if (trans) {
+                String translated = processEntry(value, null);
+                outbuf.append(translated);
+            } else {
+                outbuf.append(value);
+            }
+        }
+    }
+
+   /**
+     * Reset buffer for Test.
+     */
+    void resetOutbuf() {
+        outbuf = new StringBuilder();
+    }
+
+    /**
+     * Get buffer contents for Test.
+     */
+    String getOutbuf() {
+        return outbuf.toString();
+    }
+    /**
+     * Append to buffer for test.
+     */
+    void appendOutbuf(String text) {
+        outbuf.append(text);
     }
 }

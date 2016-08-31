@@ -1,4 +1,4 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import org.pegdown.ast.*;
 
@@ -6,13 +6,13 @@ import static org.parboiled.common.Preconditions.checkArgNotNull;
 
 /**
  * Markdown parser and serializer class.
- * Created by miurahr on 16/08/22.
+ * @author Hiroshi Miura
  */
 class MarkdownSerializer implements Visitor {
-    private MarkdownFilterBase markdownFilter;
+    private EntryHandler handler;
 
-    MarkdownSerializer(MarkdownFilterBase filter) {
-        markdownFilter = filter;
+    MarkdownSerializer(EntryHandler entryHandler) {
+        handler = entryHandler;
     }
 
     /**
@@ -29,8 +29,8 @@ class MarkdownSerializer implements Visitor {
      * @param node root node.
      */
     public void visit(RootNode node) {
-        node.getReferences().stream().forEachOrdered(refNode -> visitChildren(refNode));
-        node.getAbbreviations().stream().forEachOrdered(abbrNode -> visitChildren(abbrNode));
+        node.getReferences().stream().forEachOrdered(this::visitChildren);
+        node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
         visitChildren(node);
     }
 
@@ -39,7 +39,7 @@ class MarkdownSerializer implements Visitor {
      * @param node text node.
      */
     public void visit(TextNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -47,7 +47,7 @@ class MarkdownSerializer implements Visitor {
      * @param node link node.
      */
     public void visit(AnchorLinkNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -55,7 +55,7 @@ class MarkdownSerializer implements Visitor {
      * @param node link node.
      */
     public void visit(AutoLinkNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -63,7 +63,7 @@ class MarkdownSerializer implements Visitor {
      * @param node code node.
      */
     public void visit(CodeNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -71,7 +71,7 @@ class MarkdownSerializer implements Visitor {
      * @param node html node.
      */
     public void visit(InlineHtmlNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -79,7 +79,7 @@ class MarkdownSerializer implements Visitor {
      * @param node mail link.
      */
     public void visit(MailLinkNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -87,11 +87,11 @@ class MarkdownSerializer implements Visitor {
      * @param node text node.
      */
     public void visit(SpecialTextNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     public void visit(HtmlBlockNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -99,7 +99,7 @@ class MarkdownSerializer implements Visitor {
      * @param node verbatim node.
      */
     public void visit(VerbatimNode node) {
-        markdownFilter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -107,14 +107,12 @@ class MarkdownSerializer implements Visitor {
      * @param node table node.
      */
     public void visit(TableNode node) {
-        markdownFilter.startTable();
         visitChildren(node);
-        markdownFilter.endTable();
     }
 
     /**
      * Start paragraph, also to start entry.
-     * @param node
+     * @param node paragraph node.
      */
     public void visit(ParaNode node) {
         visitChildren(node);

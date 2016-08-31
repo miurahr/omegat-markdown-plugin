@@ -1,4 +1,4 @@
-package tokyo.northside.omegat;
+package tokyo.northside.omegat.markdown;
 
 import static org.testng.Assert.*;
 
