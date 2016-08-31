@@ -1,7 +1,5 @@
 package tokyo.northside.omegat.markdown;
 
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ast.RootNode;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -15,7 +13,7 @@ import static org.testng.Assert.*;
  */
 public class MarkdownSerializerTest {
 
-    class MockFilter extends OmegatMarkdownFilter {
+    private class MockFilter extends OmegatMarkdownFilter {
         private List<String> entries = new ArrayList<>();
 
         /**
