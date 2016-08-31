@@ -1,13 +1,26 @@
 package tokyo.northside.omegat.markdown;
 
-import java.awt.*;
-import java.io.*;
+import java.awt.Dialog;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.omegat.core.Core;
-import org.omegat.filters2.*;
+import org.omegat.filters2.FilterContext;
+import org.omegat.filters2.IAlignCallback;
+import org.omegat.filters2.IFilter;
+import org.omegat.filters2.IParseCallback;
+import org.omegat.filters2.ITranslateCallback;
+import org.omegat.filters2.Instance;
 
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
@@ -86,7 +99,8 @@ public class OmegatMarkdownFilter implements IFilter {
     }
 
     /**
-     * Define fuzzy mark prefix for source which will be stored in TM. It's 'fuzzy' by default, but each
+     * Define fuzzy mark prefix for source which will be stored in TM.
+     * It's 'fuzzy' by default, but each
      * filter can redefine it.
      *
      * @return fuzzy mark prefix
@@ -96,7 +110,8 @@ public class OmegatMarkdownFilter implements IFilter {
     }
 
     /**
-     * OmegaT calls this to see whether the filter has any options. By default returns false, so filter
+     * OmegaT calls this to see whether the filter has any options.
+     * By default returns false, so filter
      * authors should override this to tell OmegaT core that this filter has options.
      *
      * @return True if the filter has any options, and false otherwise.
@@ -108,7 +123,8 @@ public class OmegatMarkdownFilter implements IFilter {
     /**
      * {@inheritDoc}
      */
-    public Map<String, String> changeOptions(Dialog parent, Map<String, String> config) {
+    public Map<String, String> changeOptions(final Dialog parent,
+                                             final Map<String, String> config) {
         return null;
     }
 
@@ -142,19 +158,22 @@ public class OmegatMarkdownFilter implements IFilter {
     }
 
     /**
-     * Returns whether the file is supported by the filter, given the file and possible file's encoding (
+     * Returns whether the file is supported by the filter,
+     * given the file and possible file's encoding (
      * <code>null</code> encoding means autodetect).
      *
      * @param inFile Source file.
+     * @param config optional configuration.
      * @param fc     Filter context.
      * @return Does the filter support the file.
      */
-    public boolean isFileSupported(File inFile, Map<String, String> config, FilterContext fc) {
+    public boolean isFileSupported(final File inFile, final Map<String, String> config,
+                                   final FilterContext fc) {
         String inEncoding = fc.getInEncoding();
         try (BufferedReader reader = new BufferedReader(
-                (inEncoding == null) ?
-                        new InputStreamReader(new FileInputStream(inFile)) :
-                        new InputStreamReader(new FileInputStream(inFile), inEncoding))) {
+                (inEncoding == null)
+                        ? new InputStreamReader(new FileInputStream(inFile))
+                        : new InputStreamReader(new FileInputStream(inFile), inEncoding))) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
@@ -177,7 +196,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param trimmed trimmed string.
      * @return true if it has MarkDown header, otherwise false.
      */
-    private int getHeadingLevel(String trimmed) {
+    private int getHeadingLevel(final String trimmed) {
         String[] headers = {"######", "#####", "####", "###", "##", "#"};
         return Arrays.stream(headers)
                 .filter(trimmed::startsWith)
@@ -195,8 +214,9 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param callback callback for parsed data
      * @throws IOException when I/O error happened.
      */
-    public final void parseFile(File inFile, Map<String, String> config, FilterContext fc,
-                                IParseCallback callback) throws IOException {
+    public final void parseFile(final File inFile, final Map<String, String> config,
+                                final FilterContext fc, final IParseCallback callback)
+            throws IOException {
         entryParseCallback = callback;
         entryTranslateCallback = null;
         entryAlignCallback = null;
@@ -222,8 +242,9 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param callback callback for store aligned data
      * @throws IOException when I/O error happened.
      */
-    public final void alignFile(File inFile, File outFile, Map<String, String> config,
-                                FilterContext fc, IAlignCallback callback) throws IOException {
+    public final void alignFile(final File inFile, final File outFile,
+                                final Map<String, String> config, final FilterContext fc,
+                                final IAlignCallback callback) throws IOException {
         entryParseCallback = null;
         entryTranslateCallback = null;
         entryAlignCallback = callback;
@@ -244,10 +265,11 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param config   filter's configuration options
      * @param fc       filters context.
      * @param callback callback for get translation
-     * @throes IOException when I/O error happened.
+     * @throws IOException when I/O error happened.
      */
-    public final void translateFile(File inFile, File outFile, Map<String, String> config,
-                                    FilterContext fc, ITranslateCallback callback) throws IOException {
+    public final void translateFile(final File inFile, final File outFile,
+                                    final Map<String, String> config, final FilterContext fc,
+                                    final ITranslateCallback callback) throws IOException {
         entryParseCallback = null;
         entryTranslateCallback = callback;
         entryAlignCallback = null;
@@ -269,7 +291,8 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc      filter context.
      * @throws IOException throes when I/O error happened.
      */
-    void processFile(File inFile, File outFile, FilterContext fc) throws IOException {
+    void processFile(final File inFile, final File outFile, final FilterContext fc)
+            throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(inFile))) {
             process(reader);
             reader.close();
@@ -277,9 +300,10 @@ public class OmegatMarkdownFilter implements IFilter {
             if (outFile != null) {
                 String outEncoding = getOutputEncoding(fc);
                 try (BufferedWriter outfile = new BufferedWriter(
-                        (outEncoding == null) ?
-                                new OutputStreamWriter(new FileOutputStream(outFile)) :
-                                new OutputStreamWriter(new FileOutputStream(outFile), outEncoding))) {
+                        (outEncoding == null)
+                                ? new OutputStreamWriter(new FileOutputStream(outFile))
+                                : new OutputStreamWriter(new FileOutputStream(outFile),
+                                        outEncoding))) {
                     outfile.write(outbuf.toString());
                     outfile.flush();
                     outfile.close();
@@ -294,7 +318,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param reader reader specified to source markdown file.
      * @throws IOException throws when I/O error hapened.
      */
-    void process(BufferedReader reader) throws IOException {
+    void process(final BufferedReader reader) throws IOException {
         resetOutbuf();
         EntryHandler handler = new EntryHandler(this, IOUtils.toCharArray(reader));
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
@@ -312,7 +336,7 @@ public class OmegatMarkdownFilter implements IFilter {
      *
      * @param testInput Markdown strings.
      */
-    void process(String testInput) {
+    void process(final String testInput) {
         resetOutbuf();
         EntryHandler handler = new EntryHandler(this, testInput.toCharArray());
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
@@ -328,7 +352,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param comment entry comment if exist.
      * @return translation if TranslationCallback defined, otherwise original entry.
      */
-    String processEntry(String entry, String comment) {
+    String processEntry(final String entry, final String comment) {
         if (entryParseCallback != null) {
             entryParseCallback.addEntry(null, entry, null, false, comment, null, this, null);
             return entry;
@@ -357,11 +381,12 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc filter context.
      * @return Encoding for output file.
      */
-    public String getOutputEncoding(FilterContext fc) {
+    public String getOutputEncoding(final FilterContext fc) {
         String encoding = fc.getOutEncoding();
         if (encoding == null && isTargetEncodingVariable()) {
             // Use input encoding if it's Unicode; otherwise default to UTF-8
-            if (inEncodingLastParsedFile != null && inEncodingLastParsedFile.toLowerCase().startsWith("utf-")) {
+            if (inEncodingLastParsedFile != null && inEncodingLastParsedFile
+                    .toLowerCase().startsWith("utf-")) {
                 encoding = inEncodingLastParsedFile;
             } else {
                 encoding = "UTF-8";
@@ -376,7 +401,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param value entry string.
      * @param trans true when make translation for entry, otherwise write directory.
      */
-    void writeTranslate(String value, boolean trans) {
+    void writeTranslate(final String value, final boolean trans) {
         if (!value.isEmpty()) {
             if (trans) {
                 String translated = processEntry(value, null);
@@ -404,7 +429,7 @@ public class OmegatMarkdownFilter implements IFilter {
     /**
      * Append to buffer for test.
      */
-    void appendOutbuf(String text) {
+    void appendOutbuf(final String text) {
         outbuf.append(text);
     }
 }

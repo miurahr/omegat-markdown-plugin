@@ -14,7 +14,7 @@ class EntryHandler {
     private char[] articleBuf;
     private int currentBufPosition;
 
-    EntryHandler(OmegatMarkdownFilter filter, final char[] article) {
+    EntryHandler(final OmegatMarkdownFilter filter, final char[] article) {
         this.filter = filter;
         articleBuf = article;
         currentBufPosition = 0;
@@ -24,11 +24,11 @@ class EntryHandler {
         return articleBuf;
     }
 
-    void putEntry(TextNode node) {
+    void putEntry(final TextNode node) {
         this.putEntry(node.getText(), node.getStartIndex(), node.getEndIndex());
     }
 
-    void putEntry(String text, int start, int end) {
+    void putEntry(final String text, final int start, final int end) {
         if (start - currentBufPosition > 0) {
             char[] buf = new char[start - currentBufPosition];
             System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
