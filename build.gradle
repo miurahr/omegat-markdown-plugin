@@ -38,7 +38,7 @@ jar {
         exclude "META-INF/MANIFEST.MF"
     }
     manifest {
-        attributes("OmegaT-Plugins": "tokyo.northside.omegat.OmegatMarkdownFilter")
+        attributes("OmegaT-Plugins": "tokyo.northside.omegat.markdown.OmegatMarkdownFilter")
     }
 }
 
