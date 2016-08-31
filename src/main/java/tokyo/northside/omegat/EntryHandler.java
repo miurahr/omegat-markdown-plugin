@@ -1,20 +1,26 @@
 package tokyo.northside.omegat;
 
+import org.pegdown.ast.TextNode;
+
 /**
- * Created by miurahr on 16/08/30.
+ * Entry Handler for PegDown Markdown parser.
+ * <p>
+ * Convert serializer callback to OmegaT entries.
+ * @author Hiroshi Miura
  */
-public class EntryHandler {
+class EntryHandler {
 
-    protected OmegatMarkdownFilter filter;
+    private OmegatMarkdownFilter filter;
 
-    public EntryHandler() {
-    }
-
-    public EntryHandler(OmegatMarkdownFilter filter) {
+    EntryHandler(OmegatMarkdownFilter filter) {
         this.filter = filter;
     }
 
-    void writeTranslate(final String text, final int start, final int end) {
-        filter.writeTranslate(text, start, end);
+    void putEntry(TextNode node) {
+        filter.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    void finish() {
+        filter.flushToEof();
     }
 }

@@ -29,8 +29,8 @@ class MarkdownSerializer implements Visitor {
      * @param node root node.
      */
     public void visit(RootNode node) {
-        node.getReferences().stream().forEachOrdered(refNode -> visitChildren(refNode));
-        node.getAbbreviations().stream().forEachOrdered(abbrNode -> visitChildren(abbrNode));
+        node.getReferences().stream().forEachOrdered(this::visitChildren);
+        node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
         visitChildren(node);
     }
 
@@ -39,7 +39,7 @@ class MarkdownSerializer implements Visitor {
      * @param node text node.
      */
     public void visit(TextNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -47,7 +47,7 @@ class MarkdownSerializer implements Visitor {
      * @param node link node.
      */
     public void visit(AnchorLinkNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -55,7 +55,7 @@ class MarkdownSerializer implements Visitor {
      * @param node link node.
      */
     public void visit(AutoLinkNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -63,7 +63,7 @@ class MarkdownSerializer implements Visitor {
      * @param node code node.
      */
     public void visit(CodeNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -71,7 +71,7 @@ class MarkdownSerializer implements Visitor {
      * @param node html node.
      */
     public void visit(InlineHtmlNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -79,7 +79,7 @@ class MarkdownSerializer implements Visitor {
      * @param node mail link.
      */
     public void visit(MailLinkNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -87,11 +87,11 @@ class MarkdownSerializer implements Visitor {
      * @param node text node.
      */
     public void visit(SpecialTextNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     public void visit(HtmlBlockNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -99,7 +99,7 @@ class MarkdownSerializer implements Visitor {
      * @param node verbatim node.
      */
     public void visit(VerbatimNode node) {
-        handler.writeTranslate(node.getText(), node.getStartIndex(), node.getEndIndex());
+        handler.putEntry(node);
     }
 
     /**
@@ -112,7 +112,7 @@ class MarkdownSerializer implements Visitor {
 
     /**
      * Start paragraph, also to start entry.
-     * @param node
+     * @param node paragraph node.
      */
     public void visit(ParaNode node) {
         visitChildren(node);

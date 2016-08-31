@@ -21,7 +21,7 @@ public class MarkdownSerializerTest {
         private List<String> entries = new ArrayList<>();
 
         /**
-         * Mock for writeTranslate()
+         * Mock for putEntry()
          * <p>
          * Store to local variable instead of writing file.
          * It don't call translation.
@@ -46,7 +46,7 @@ public class MarkdownSerializerTest {
             PegDownProcessor processor = new PegDownProcessor();
             RootNode astRoot = processor.parseMarkdown(articleBuf);
             serializer.processNodes(astRoot);
-            flushToEof();
+            handler.finish();
         }
 
         /** for test */
