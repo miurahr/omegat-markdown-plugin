@@ -90,7 +90,7 @@ public class MarkdownSerializerTest {
         expected.add("HEADING level 1");
         expected.add("Heading with under lines (level2)");
         expected.add("Normal clause part 1\n" +
-                "[External link part 1](https://example.com/link/to/external/url)\n" +
+                "<a>External link part 1</a><h>https://example.com/link/to/external/url</h>)\n" +
                 "continuous clause sentense.");
         expected.add("Heading level3 <b>Bold part 1</b>");
         expected.add("quote part1");

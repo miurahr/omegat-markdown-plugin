@@ -41,7 +41,25 @@ class EntryHandler {
      * @param node PegDown's TextNode node.
      */
     void putEntry(final TextNode node) {
-        this.putEntry(node.getText(), node.getStartIndex(), node.getEndIndex());
+        String text = node.getText();
+        int start = node.getStartIndex();
+        int end = node.getEndIndex();
+        putEntry(text, start, end);
+    }
+
+    void putMark(final String chars) {
+        if (chars.startsWith("**")) {
+            putEntry("<b>");
+        } else if (chars.startsWith("__")) { // italic
+            putEntry("<i>");
+        } else if (chars.startsWith("<")) {
+            putEntry(chars);
+        }
+    }
+
+    void putMark(final String chars, final int next) {
+        putMark(chars);
+        currentBufPosition = next;
     }
 
     void startPara() {
@@ -56,8 +74,17 @@ class EntryHandler {
         }
     }
 
-    private String getMark(String tag) {
-        return tag;
+    void putEntry(final String text, final int index) {
+        putEntry(text);
+        currentBufPosition = index;
+    }
+
+    void putEntry(final String text) {
+        if (para > 0) {
+            entryBuf.append(text);
+        } else {
+            filter.writeTranslate(text, true);
+        }
     }
 
     private void putEntry(final String text, final int start, final int end) {
@@ -65,20 +92,10 @@ class EntryHandler {
             char[] buf = new char[start - currentBufPosition];
             System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
             String token = String.valueOf(buf);
-            if (para > 0) {
-                entryBuf.append(text);
-            } else {
-                filter.writeTranslate(token, false);
-                filter.writeTranslate(text, true);
-            }
-            currentBufPosition = end;
+            filter.writeTranslate(token, false);
+            putEntry(text, end);
         } else if (start - currentBufPosition == 0) {
-            currentBufPosition = end;
-            if (para > 0) {
-                entryBuf.append(text);
-            } else {
-                filter.writeTranslate(text, true);
-            }
+            putEntry(text, end);
         }
     }
 

@@ -160,6 +160,32 @@ class MarkdownSerializer implements Visitor {
     }
 
     /**
+     * Accept Strong or Emphasis node.
+     * @param node
+     */
+    public void visit(final StrongEmphSuperNode node) {
+        handler.startPara();
+        handler.putMark(node.getChars(), node.getStartIndex() + node.getChars().length());
+        visitChildren(node);
+        handler.putMark(node.getChars(), node.getEndIndex());
+        handler.endPara();
+    }
+
+    public void visit(final RefLinkNode node) {
+        visitChildren(node);
+    }
+
+    public void visit(final ExpLinkNode node) {
+        handler.startPara();
+        handler.putMark("<a>", node.getStartIndex() + 1);
+        visitChildren(node);
+        handler.putMark("</a><h>");
+        handler.putEntry(node.url);
+        handler.putMark("</h>", node.getEndIndex());
+        handler.endPara();
+    }
+
+    /**
      * Accept other nodes which should visit children.
      * @param node super node.
      */
@@ -179,10 +205,6 @@ class MarkdownSerializer implements Visitor {
         visitChildren(node);
     }
 
-    public void visit(final ExpLinkNode node) {
-        visitChildren(node);
-    }
-
     public void visit(final HeaderNode node) {
         visitChildren(node);
     }
@@ -191,15 +213,7 @@ class MarkdownSerializer implements Visitor {
         visitChildren(node);
     }
 
-    public void visit(final RefLinkNode node) {
-        visitChildren(node);
-    }
-
     public void visit(final StrikeNode node) {
-        visitChildren(node);
-    }
-
-    public void visit(final StrongEmphSuperNode node) {
         visitChildren(node);
     }
 
