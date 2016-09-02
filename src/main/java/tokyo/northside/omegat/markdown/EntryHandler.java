@@ -1,6 +1,8 @@
 package tokyo.northside.omegat.markdown;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.pegdown.ast.TextNode;
+
 
 /**
  * Entry Handler for PegDown Markdown parser.
@@ -38,10 +40,13 @@ class EntryHandler {
 
     /**
      * Convenient function to call from Serializer.
+     * <p>
+     *     This escapes embed HTML.
+     * </p>
      * @param node PegDown's TextNode node.
      */
     void putEntry(final TextNode node) {
-        String text = node.getText();
+        String text = StringEscapeUtils.escapeHtml(node.getText());
         int start = node.getStartIndex();
         int end = node.getEndIndex();
         putEntry(text, start, end);
@@ -52,6 +57,8 @@ class EntryHandler {
             putEntry("<b>");
         } else if (chars.startsWith("__")) { // italic
             putEntry("<i>");
+        } else if (chars.startsWith("~~")) { //strikethrough
+            putEntry("<s>");
         } else if (chars.startsWith("<")) {
             putEntry(chars);
         }
@@ -60,6 +67,16 @@ class EntryHandler {
     void putMark(final String chars, final int next) {
         putMark(chars);
         currentBufPosition = next;
+    }
+
+    String convMark(final String text) {
+        return text.replaceAll("<b>", "**")
+                .replaceAll("<i>", "__")
+                .replaceAll("<a>", "[")
+                .replaceAll("</a>", "]")
+                .replaceAll("<h>", "(")
+                .replaceAll("</h>", ")")
+                .replaceAll("<s>", "~~");
     }
 
     void startPara() {

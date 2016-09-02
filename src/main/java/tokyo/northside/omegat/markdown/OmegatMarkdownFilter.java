@@ -13,7 +13,6 @@ import java.io.OutputStreamWriter;
 import java.util.Arrays;
 import java.util.Map;
 
-import org.apache.commons.io.IOUtils;
 import org.omegat.core.Core;
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
@@ -22,9 +21,11 @@ import org.omegat.filters2.IParseCallback;
 import org.omegat.filters2.ITranslateCallback;
 import org.omegat.filters2.Instance;
 
+import org.apache.commons.io.IOUtils;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
 
+import static org.parboiled.common.Preconditions.checkArgNotNull;
 
 /**
  * Filter for Markdown.
@@ -32,6 +33,10 @@ import org.pegdown.ast.RootNode;
  * @author Hiroshi Miura
  */
 public class OmegatMarkdownFilter implements IFilter {
+    /**
+     * Markdown Serializer callback handler.
+     */
+    protected EntryHandler handler;
 
     /**
      * Callback for parse.
@@ -319,13 +324,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @throws IOException throws when I/O error hapened.
      */
     void process(final BufferedReader reader) throws IOException {
-        resetOutbuf();
-        EntryHandler handler = new EntryHandler(this, IOUtils.toCharArray(reader));
-        MarkdownSerializer serializer = new MarkdownSerializer(handler);
-        PegDownProcessor processor = new PegDownProcessor();
-        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
-        serializer.processNodes(astRoot);
-        handler.finish();
+        process(IOUtils.toCharArray(reader));
     }
 
     /**
@@ -337,12 +336,17 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param testInput Markdown strings.
      */
     void process(final String testInput) {
+        process(testInput.toCharArray());
+    }
+
+    void process(final char[] article) {
         resetOutbuf();
-        EntryHandler handler = new EntryHandler(this, testInput.toCharArray());
+        handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
         PegDownProcessor processor = new PegDownProcessor();
         RootNode astRoot = processor.parseMarkdown(handler.getArticle());
-        serializer.processNodes(astRoot);
+        checkArgNotNull(astRoot, "astRoot");
+        astRoot.accept(serializer);
         handler.finish();
     }
 
@@ -358,7 +362,8 @@ public class OmegatMarkdownFilter implements IFilter {
             return entry;
         } else {
             String translation = entryTranslateCallback.getTranslation(null, entry, null);
-            return translation != null ? translation : entry;
+            translation = translation != null ? translation : entry;
+            return handler.convMark(translation);
         }
     }
 
