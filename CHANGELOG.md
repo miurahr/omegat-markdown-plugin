@@ -3,13 +3,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Add
+
+### Changed
+
+### Fixed
+
+## 0.2 - 2016-09-03
+### Add
 - Support protected part. now "**", "__" and "~~"  are protected.
 - Inline components now treat as inline.
 
 ### Changed
 - Introduced AbstractMarkdownSerializer
-
-### Fixed
 
 
 ## 0.1 - 2016-08-30
@@ -19,4 +24,5 @@ All notable changes to this project will be documented in this file.
 - Generate markdown translated files.
 - Unit tests.
 
-[Unreleased]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.1...HEAD
+[Unreleased]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.2...HEAD
+[0.2]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.1...v0.2
