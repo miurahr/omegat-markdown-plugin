@@ -1,6 +1,21 @@
 package tokyo.northside.omegat.markdown;
 
-import org.pegdown.ast.*;
+import org.pegdown.ast.AnchorLinkNode;
+import org.pegdown.ast.AutoLinkNode;
+import org.pegdown.ast.CodeNode;
+import org.pegdown.ast.ExpLinkNode;
+import org.pegdown.ast.HeaderNode;
+import org.pegdown.ast.HtmlBlockNode;
+import org.pegdown.ast.InlineHtmlNode;
+import org.pegdown.ast.MailLinkNode;
+import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.QuotedNode;
+import org.pegdown.ast.SpecialTextNode;
+import org.pegdown.ast.StrikeNode;
+import org.pegdown.ast.StrongEmphSuperNode;
+import org.pegdown.ast.TextNode;
+import org.pegdown.ast.VerbatimNode;
+import org.pegdown.ast.Visitor;
 
 
 /**
@@ -41,16 +56,6 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      * @param node link node.
      */
     public void visit(final AutoLinkNode node) {
-        handler.putEntry(node);
-    }
-
-    /**
-     * Accept code node.
-     * <p>
-     *     put literals to translation entry.
-     * @param node code node.
-     */
-    public void visit(final CodeNode node) {
         handler.putEntry(node);
     }
 
@@ -168,5 +173,6 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         visitChildren(node);
         handler.endPara();
     }
+
 
 }
