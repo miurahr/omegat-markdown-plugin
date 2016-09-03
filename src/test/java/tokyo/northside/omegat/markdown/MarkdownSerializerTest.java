@@ -30,7 +30,7 @@ public class MarkdownSerializerTest {
             if (trans) {
                 entries.add(text);
             }
-            appendOutbuf(text);
+            appendOutbuf(handler.convMark(text));
         }
 
         /** for test */
@@ -63,7 +63,7 @@ public class MarkdownSerializerTest {
                 "\n" +
                 "#### Heading level 4\n" +
                 "\n" +
-                "Normal clause part 3. ~~Strikesthrough~~\n" +
+                "Normal clause part 3. ~~strikethroughs~~\n" +
                 "Test for Styling text **bold and __italic__**\n" +
                 "\n" +
                 "Heading with under lines (level2)\n" +
@@ -89,8 +89,8 @@ public class MarkdownSerializerTest {
         List<String> expected = new ArrayList<>();
         expected.add("HEADING level 1");
         expected.add("Heading with under lines (level2)");
-        expected.add("Normal clause part 1\n" +
-                "[External link part 1](https://example.com/link/to/external/url)\n" +
+        expected.add("Normal clause part 1 " +
+                "<a>External link part 1</a><h>https://example.com/link/to/external/url</h> " +
                 "continuous clause sentense.");
         expected.add("Heading level3 <b>Bold part 1</b>");
         expected.add("quote part1");
@@ -100,7 +100,7 @@ public class MarkdownSerializerTest {
                 "#\n" +
                 "echo hello world.\n");
         expected.add("Heading level 4");
-        expected.add("Normal clause part 3. <s>Strikesthrough</s>");
+        expected.add("Normal clause part 3. <s>strikethrough</s>");
         expected.add("Test for Styling text <b>bold and <i>talic</i></b>");
         expected.add("Heading with under lines (level2)");
         expected.add("In the word of abraham");
