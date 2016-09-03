@@ -11,10 +11,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.omegat.core.Core;
+import org.omegat.core.data.ProtectedPart;
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
 import org.omegat.filters2.IFilter;
@@ -349,12 +351,26 @@ public class OmegatMarkdownFilter implements IFilter {
     /**
      * Process entries and push it to OmegaT core.
      * @param entry entry string to add.
-     * @param comment entry comment if exist.
      * @return translation if TranslationCallback defined, otherwise original entry.
      */
-    String processEntry(final String entry, final String comment) {
+    String processEntry(final String entry) {
         if (entryParseCallback != null) {
-            entryParseCallback.addEntry(null, entry, null, false, comment, null, this, null);
+            entryParseCallback.addEntry(null, entry, null, false, null, null, this, null);
+            return entry;
+        } else {
+            String translation = entryTranslateCallback.getTranslation(null, entry, null);
+            return translation != null ? translation : entry;
+        }
+    }
+
+    /**
+     * Process entries and push it to OmegaT core.
+     * @param entry entry string to add.
+     * @return translation if TranslationCallback defined, otherwise original entry.
+     */
+    String processEntry(final String entry, final List<ProtectedPart> protectedParts) {
+        if (entryParseCallback != null) {
+            entryParseCallback.addEntry(null, entry, null, false, null, null, this, protectedParts);
             return entry;
         } else {
             String translation = entryTranslateCallback.getTranslation(null, entry, null);
@@ -399,12 +415,22 @@ public class OmegatMarkdownFilter implements IFilter {
      * Process entry and write translation to translated file.
      *
      * @param value entry string.
+     */
+    void writeTranslate(final String value, final List<ProtectedPart> protectedParts) {
+        String translated = processEntry(value, protectedParts);
+        outbuf.append(translated);
+    }
+
+    /**
+     * Process entry and write translation to translated file.
+     *
+     * @param value entry string.
      * @param trans true when make translation for entry, otherwise write directory.
      */
     void writeTranslate(final String value, final boolean trans) {
         if (!value.isEmpty()) {
             if (trans) {
-                String translated = processEntry(value, null);
+                String translated = processEntry(value);
                 outbuf.append(translated);
             } else {
                 outbuf.append(value);

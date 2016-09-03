@@ -1,6 +1,11 @@
 package tokyo.northside.omegat.markdown;
 
+import org.omegat.core.data.ProtectedPart;
 import org.pegdown.ast.TextNode;
+
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
  * Entry Handler for PegDown Markdown parser.
@@ -17,6 +22,8 @@ class EntryHandler {
     private StringBuilder entryBuf;
     private int para;
 
+    private List<ProtectedPart> protectedParts;
+
     EntryHandler(final OmegatMarkdownFilter filter, final char[] article) {
         this.filter = filter;
 
@@ -25,6 +32,7 @@ class EntryHandler {
 
         entryBuf = new StringBuilder();
         para = 0;
+        protectedParts = new ArrayList<>();
     }
 
     char[] getArticle() {
@@ -38,10 +46,22 @@ class EntryHandler {
 
     /**
      * Convenient function to call from Serializer.
+     * <p>
+     *     This escapes embed HTML.
+     * </p>
      * @param node PegDown's TextNode node.
      */
     void putEntry(final TextNode node) {
         putEntry(node.getText(), node.getStartIndex(), node.getEndIndex());
+    }
+
+    void putMark(final String chars, final int next) {
+        putProtectedEntry(chars);
+        currentBufPosition = next;
+    }
+
+    void putMark(final String chars) {
+        putProtectedEntry(chars);
     }
 
     void startPara() {
@@ -56,25 +76,39 @@ class EntryHandler {
         }
     }
 
+    void putEntry(final String text, final int index) {
+        putEntry(text);
+        currentBufPosition = index;
+    }
+
+    void putEntry(final String text) {
+        if (para > 0) {
+            entryBuf.append(text);
+        } else {
+            filter.writeTranslate(text, ProtectedPart.extractFor(protectedParts, text));
+        }
+    }
+
+    void putProtectedEntry(final String text) {
+        ProtectedPart pp = new ProtectedPart();
+        pp.setTextInSourceSegment(text);
+        protectedParts.add(pp);
+        if (para > 0) {
+            entryBuf.append(text);
+        } else {
+            filter.writeTranslate(text, ProtectedPart.extractFor(protectedParts, text));
+        }
+    }
+
     private void putEntry(final String text, final int start, final int end) {
         if (start - currentBufPosition > 0) {
             char[] buf = new char[start - currentBufPosition];
             System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
             String token = String.valueOf(buf);
-            if (para > 0) {
-                entryBuf.append(text);
-            } else {
-                filter.writeTranslate(token, false);
-                filter.writeTranslate(text, true);
-            }
-            currentBufPosition = end;
+            filter.writeTranslate(token, false);
+            putEntry(text, end);
         } else if (start - currentBufPosition == 0) {
-            currentBufPosition = end;
-            if (para > 0) {
-                entryBuf.append(text);
-            } else {
-                filter.writeTranslate(text, true);
-            }
+            putEntry(text, end);
         }
     }
 

@@ -1,5 +1,6 @@
 package tokyo.northside.omegat.markdown;
 
+import org.omegat.core.data.ProtectedPart;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -33,6 +34,20 @@ public class MarkdownSerializerTest {
             appendOutbuf(text);
         }
 
+         /**
+         * Mock for putEntry()
+         * <p>
+         * Store to local variable instead of writing file.
+         * It don't call translation.
+         *
+         * @param text entry text
+         */
+        @Override
+        void writeTranslate(final String text, final List<ProtectedPart> protectedParts) {
+            entries.add(text);
+            appendOutbuf(text);
+        }
+
         /** for test */
         List<String> getEntries() {
             return entries;
@@ -63,7 +78,7 @@ public class MarkdownSerializerTest {
                 "\n" +
                 "#### Heading level 4\n" +
                 "\n" +
-                "Normal clause part 3. ~~Strikesthrough~~\n" +
+                "Normal clause part 3. ~~strikethroughs~~\n" +
                 "Test for Styling text **bold and __italic__**\n" +
                 "\n" +
                 "Heading with under lines (level2)\n" +
@@ -89,28 +104,27 @@ public class MarkdownSerializerTest {
         List<String> expected = new ArrayList<>();
         expected.add("HEADING level 1");
         expected.add("Heading with under lines (level2)");
-        expected.add("Normal clause part 1\n" +
-                "[External link part 1](https://example.com/link/to/external/url)\n" +
+        expected.add("Normal clause part 1 " +
+                "[External link part 1](https://example.com/link/to/external/url) " +
                 "continuous clause sentense.");
-        expected.add("Heading level3 <b>Bold part 1</b>");
-        expected.add("quote part1");
-        expected.add("Normal clause part 2  <i>Italic</i>");
+        expected.add("Heading level3 **Bold part 1**");
+        expected.add("quote part1\n");
+        expected.add("Normal clause part 2 __Italic__");
         expected.add("quote part2 (code)\n" +
                 "#! /bin/sh\n" +
                 "#\n" +
                 "echo hello world.\n");
         expected.add("Heading level 4");
-        expected.add("Normal clause part 3. <s>Strikesthrough</s>");
-        expected.add("Test for Styling text <b>bold and <i>talic</i></b>");
+        expected.add("Normal clause part 3. ~~strikethroughs~~ Test for Styling text **bold and __italic__**");
         expected.add("Heading with under lines (level2)");
         expected.add("In the word of abraham");
         expected.add("quote.");
         expected.add("ordered list (1)");
-        expected.add("ordered list (2)\n" + "multiline");
+        expected.add("ordered list (2)  multiline");
         expected.add("<!-- HTML style comment -->");
         expected.add("unordered list (1)");
         expected.add("unordered list (2)");
-        expected.add("unordered list (3)\n" + "continuous line.");
+        expected.add("unordered list (3)  continuous line.");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
