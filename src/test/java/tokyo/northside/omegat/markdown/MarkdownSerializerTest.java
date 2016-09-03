@@ -34,20 +34,6 @@ public class MarkdownSerializerTest {
             appendOutbuf(text);
         }
 
-         /**
-         * Mock for putEntry()
-         * <p>
-         * Store to local variable instead of writing file.
-         * It don't call translation.
-         *
-         * @param text entry text
-         */
-        @Override
-        void writeTranslate(final String text, final List<ProtectedPart> protectedParts) {
-            entries.add(text);
-            appendOutbuf(text);
-        }
-
         /** for test */
         List<String> getEntries() {
             return entries;

@@ -10,6 +10,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,7 @@ public class OmegatMarkdownFilter implements IFilter {
     /**
      * Markdown Serializer callback handler.
      */
-    protected EntryHandler handler;
+    private EntryHandler handler;
 
     /**
      * Callback for parse.
@@ -64,6 +65,8 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private StringBuilder outbuf;
 
+    private List<ProtectedPart> protectedParts = new ArrayList<>();
+
     /**
      * Plugin loader.
      */
@@ -82,6 +85,9 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     public OmegatMarkdownFilter() {
         super();
+        addProtectedPart("**", "b");
+        addProtectedPart("__", "i");
+        addProtectedPart("~~", "s");
     }
 
 
@@ -298,7 +304,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc      filter context.
      * @throws IOException throes when I/O error happened.
      */
-    void processFile(final File inFile, final File outFile, final FilterContext fc)
+    private void processFile(final File inFile, final File outFile, final FilterContext fc)
             throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(inFile))) {
             process(reader);
@@ -341,7 +347,7 @@ public class OmegatMarkdownFilter implements IFilter {
         process(testInput.toCharArray());
     }
 
-    void process(final char[] article) {
+    private void process(final char[] article) {
         resetOutbuf();
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
@@ -353,17 +359,19 @@ public class OmegatMarkdownFilter implements IFilter {
     }
 
     /**
-     * Process entries and push it to OmegaT core.
-     * @param entry entry string to add.
-     * @return translation if TranslationCallback defined, otherwise original entry.
+     * Process entry and write translation to translated file.
+     *
+     * @param value entry string.
+     * @param trans true when make translation for entry, otherwise write directory.
      */
-    String processEntry(final String entry) {
-        if (entryParseCallback != null) {
-            entryParseCallback.addEntry(null, entry, null, false, null, null, this, null);
-            return entry;
-        } else {
-            String translation = entryTranslateCallback.getTranslation(null, entry, null);
-            return translation != null ? translation : entry;
+    void writeTranslate(final String value, final boolean trans) {
+        if (!value.isEmpty()) {
+            if (trans) {
+                String translated = processEntry(value);
+                outbuf.append(translated);
+            } else {
+                outbuf.append(value);
+            }
         }
     }
 
@@ -372,9 +380,10 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param entry entry string to add.
      * @return translation if TranslationCallback defined, otherwise original entry.
      */
-    String processEntry(final String entry, final List<ProtectedPart> protectedParts) {
+    private String processEntry(final String entry) {
         if (entryParseCallback != null) {
-            entryParseCallback.addEntry(null, entry, null, false, null, null, this, protectedParts);
+            entryParseCallback.addEntry(null, entry, null, false, null, null, this,
+                    ProtectedPart.extractFor(protectedParts, entry));
             return entry;
         } else {
             String translation = entryTranslateCallback.getTranslation(null, entry, null);
@@ -401,7 +410,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc filter context.
      * @return Encoding for output file.
      */
-    public String getOutputEncoding(final FilterContext fc) {
+    private String getOutputEncoding(final FilterContext fc) {
         String encoding = fc.getOutEncoding();
         if (encoding == null && isTargetEncodingVariable()) {
             // Use input encoding if it's Unicode; otherwise default to UTF-8
@@ -416,32 +425,20 @@ public class OmegatMarkdownFilter implements IFilter {
     }
 
     /**
-     * Process entry and write translation to translated file.
-     *
-     * @param value entry string.
+     * Add entry as ProtectedPart.
+     * @param text
      */
-    void writeTranslate(final String value, final List<ProtectedPart> protectedParts) {
-        String translated = processEntry(value, protectedParts);
-        outbuf.append(translated);
-    }
-
-    /**
-     * Process entry and write translation to translated file.
-     *
-     * @param value entry string.
-     * @param trans true when make translation for entry, otherwise write directory.
-     */
-    void writeTranslate(final String value, final boolean trans) {
-        if (!value.isEmpty()) {
-            if (trans) {
-                String translated = processEntry(value);
-                outbuf.append(translated);
-            } else {
-                outbuf.append(value);
-            }
+    void addProtectedPart(final String text, final String replace) {
+        if (text != null) {
+            ProtectedPart pp = new ProtectedPart();
+            pp.setTextInSourceSegment(text);
+            pp.setDetailsFromSourceFile(text);
+            pp.setReplacementUniquenessCalculation(replace);
+            pp.setReplacementWordsCountCalculation(replace);
+            pp.setReplacementMatchCalculation(replace);
+            protectedParts.add(pp);
         }
     }
-
     /**
      * Reset buffer for Test.
      */
