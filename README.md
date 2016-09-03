@@ -19,10 +19,6 @@ It can do:
 
 ## Known issues
 
-- It cannot treat inline components properly such as **Emphasis** and  [link](http://example.com).
-  You may find these components as individual sentenses instead of a part of sentense..
-
-
 - It cannot treat table elements properly.
 
 ## License
