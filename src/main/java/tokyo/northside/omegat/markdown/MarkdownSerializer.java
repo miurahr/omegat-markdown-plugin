@@ -15,25 +15,6 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     }
 
     /**
-     * Process root node of PegDown parser's AST.
-     * @param astRoot root node of AST.
-     */
-    void processNodes(final RootNode astRoot) {
-        checkArgNotNull(astRoot, "astRoot");
-        astRoot.accept(this);
-    }
-
-    /**
-     * Accept root node.
-     * @param node root node.
-     */
-    public void visit(final RootNode node) {
-        node.getReferences().stream().forEachOrdered(this::visitChildren);
-        node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
-        visitChildren(node);
-    }
-
-    /**
      * Accept text node.
      * <p>
      *     put literals to translation entry.
