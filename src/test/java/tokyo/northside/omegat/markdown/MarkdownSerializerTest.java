@@ -1,6 +1,5 @@
 package tokyo.northside.omegat.markdown;
 
-import org.omegat.core.data.ProtectedPart;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -192,4 +191,25 @@ public class MarkdownSerializerTest {
         assertEquals(filter.getOutbuf(), testInput);
     }
 
+    @Test
+    public void testVisit_inlineCode() throws Exception {
+        String testInput = "By default, when building the site, all files are copied to the destination `_site` folder." +
+                "Some files are excluded in the `_config.yml` and `sdkdocs-template/jekyll/_config-defaults.yml` files.";
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
+
+    @Test
+    public void testVisit_inlineCode_in_listItem() throws Exception {
+        String testInput = "Here is a list.\n\n" +
+                "* Some are excluded in the `_config.yml` file.\n";
+        List<String> expected = new ArrayList<>();
+        expected.add("Here is a list.");
+        expected.add("Some are excluded in the `_config.yml` file.");
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+        assertEquals(filter.getEntries(), expected);
+    }
 }
