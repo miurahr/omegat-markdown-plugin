@@ -141,7 +141,7 @@ public class MarkdownSerializerTest {
     }
 
     @Test
-    public void testVisit_em() throws Exception {
+    public void testVisit_strong1() throws Exception {
         String testInput = "**Emphasis**\n\n";
         MockFilter filter = new MockFilter();
         filter.process(testInput);
@@ -149,8 +149,24 @@ public class MarkdownSerializerTest {
     }
 
     @Test
-    public void testVisit_itaric() throws Exception {
-        String testInput = "__itaric__\n\n";
+    public void testVisit_strong2() throws Exception {
+        String testInput = "__Emphasis__\n\n";
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
+
+    @Test
+    public void testVisit_em1() throws Exception {
+        String testInput = "_itaric_\n\n";
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
+
+    @Test
+    public void testVisit_em2() throws Exception {
+        String testInput = "*itaric*\n\n";
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
