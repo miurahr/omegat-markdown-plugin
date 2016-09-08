@@ -3,10 +3,16 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 ### Add
+- Integration/Acceptance test.
+- Support Table.
 
 ### Changed
+- Now we add an option 'ALL' of PegDown parser to recognize Github extensions.
 
 ### Fixed
+- Explicit specify character set  for reading and writing.
+- Treat correctry for quotes as in inline element
+- Every source files have license header.
 
 ## 0.2 - 2016-09-03
 ### Add

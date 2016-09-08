@@ -19,7 +19,7 @@ It can do:
 
 ## Known issues
 
-- It cannot treat table elements properly.
+- It cannot correctly treat fenced code as inline elements as list item.
 
 ## License
 
