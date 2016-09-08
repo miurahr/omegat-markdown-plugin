@@ -42,6 +42,7 @@ jar {
     }
 }
 
+
 checkstyle {
     config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
     ignoreFailures = true
@@ -89,7 +90,6 @@ distributions {
         }
     }
 }
-
 
 project(":stub") {
     apply plugin: 'java'
