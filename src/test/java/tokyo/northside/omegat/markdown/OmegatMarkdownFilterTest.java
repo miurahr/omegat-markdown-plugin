@@ -136,7 +136,7 @@ class OmegatMarkdownFilterTest extends TestFilterBase {
     }
 
     @Test
-    void testProcess_table() throws Exception {
+    void testTranslate_table() throws Exception {
         OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
         translateText(mdf, "/source/table.md");
     }
