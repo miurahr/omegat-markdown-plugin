@@ -50,6 +50,7 @@ import org.omegat.filters2.ITranslateCallback;
 import org.omegat.filters2.Instance;
 
 import org.apache.commons.io.IOUtils;
+import org.pegdown.Extensions;
 import org.pegdown.PegDownProcessor;
 import org.pegdown.ast.RootNode;
 
@@ -92,6 +93,8 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private List<ProtectedPart> protectedParts = new ArrayList<>();
 
+    protected static final int parserOption = Extensions.ALL;
+
     /**
      * Plugin loader.
      */
@@ -113,6 +116,7 @@ public class OmegatMarkdownFilter implements IFilter {
         addProtectedPart("**", "b");
         addProtectedPart("__", "i");
         addProtectedPart("~~", "s");
+        addProtectedPart("```", "v");
         addProtectedPart("`", "q");
     }
 
@@ -377,7 +381,7 @@ public class OmegatMarkdownFilter implements IFilter {
         resetOutbuf();
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
-        PegDownProcessor processor = new PegDownProcessor();
+        PegDownProcessor processor = new PegDownProcessor(parserOption);
         RootNode astRoot = processor.parseMarkdown(handler.getArticle());
         checkArgNotNull(astRoot, "astRoot");
         astRoot.accept(serializer);

@@ -21,6 +21,7 @@
     <bytecodeTargetLevel>
       <module name="markdown-plugin_main" target="1.8" />
       <module name="markdown-plugin_test" target="1.8" />
+      <module name="omegat-markdown-plugin_integrationTest" target="1.8" />
       <module name="omegat-markdown-plugin_main" target="1.8" />
       <module name="omegat-markdown-plugin_test" target="1.8" />
       <module name="stub_main" target="1.8" />

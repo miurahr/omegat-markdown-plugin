@@ -3,11 +3,14 @@ apply plugin: 'jacoco'
 apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
 apply plugin: 'distribution'
+apply plugin: 'idea'
 
 version = '0.2'
 
 configurations {
     provided
+    integrationTestCompile.extendsFrom testCompile
+    integrationTestRuntime.extendsFrom testRuntime
 }
 
 sourceSets {
@@ -15,6 +18,17 @@ sourceSets {
         compileClasspath += configurations.provided
         test.compileClasspath += configurations.provided
         test.runtimeClasspath += configurations.provided
+    }
+
+    integrationTest {
+        java {
+            compileClasspath += main.output + test.output
+            compileClasspath += configurations.provided
+            runtimeClasspath += main.output + test.output
+            runtimeClasspath += configurations.provided
+            srcDir file('src/integration-test/java')
+        }
+        resources.srcDir file('src/integration-test/resources')
     }
 }
 
@@ -29,6 +43,8 @@ dependencies {
     provided project(":stub")
     testCompile 'org.testng:testng:6.9.10'
     testCompile project(":stub")
+    integrationTestCompile 'org.testng:testng:6.9.10'
+    integrationTestCompile project(":stub")
 }
 test.useTestNG()
 
@@ -42,16 +58,18 @@ jar {
     }
 }
 
-
 checkstyle {
     config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
     ignoreFailures = true
     toolVersion = '7.1'
 }
+tasks.checkstyleMain.setGroup('Verification')
 
 // Force prevent checkstyle/findbugs on Test.
 task checkstyleTest(overwrite: true) << {}
+task checkstyleIntegrationTest(overwrite: true) << {}
 task findbugsTest(overwrite: true) << {}
+task findbugsIntegrationTest(overwrite: true) << {}
 
 findbugs {
     ignoreFailures = true
@@ -60,6 +78,23 @@ tasks.withType(FindBugs) {
     reports {
       xml.enabled = false
       html.enabled = true
+    }
+    setGroup('Verification')
+}
+
+task integrationTest(type: Test) {
+    description = "Integration/Acceptance Test"
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    useTestNG()
+}
+check.dependsOn integrationTest
+integrationTest.mustRunAfter test
+tasks.integrationTest.setGroup('Verification')
+
+idea {
+    module {
+        testSourceDirs += file('src/integration-test/java')
     }
 }
 

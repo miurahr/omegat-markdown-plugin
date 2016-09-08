@@ -132,6 +132,12 @@ class EntryHandler {
         currentBufPosition = next;
     }
 
+    void putMarkOut(final String chars) {
+        if (para == 0) {
+            filter.writeTranslate(chars, false);
+        }
+    }
+
     /**
      * Put protected entry.
      * @param chars
