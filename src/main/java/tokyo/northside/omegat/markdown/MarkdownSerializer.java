@@ -7,9 +7,9 @@ import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.HeaderNode;
 import org.pegdown.ast.HtmlBlockNode;
 import org.pegdown.ast.InlineHtmlNode;
+import org.pegdown.ast.ListItemNode;
 import org.pegdown.ast.MailLinkNode;
 import org.pegdown.ast.ParaNode;
-import org.pegdown.ast.QuotedNode;
 import org.pegdown.ast.SpecialTextNode;
 import org.pegdown.ast.StrikeNode;
 import org.pegdown.ast.StrongEmphSuperNode;
@@ -120,6 +120,16 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     }
 
     /**
+     * Start list item paragraph.
+     * @param node list item node.
+     */
+    public void visit(final ListItemNode node) {
+        handler.startPara();
+        visitChildren(node);
+        handler.endPara();
+    }
+
+    /**
      * Accept Strong or Emphasis node.
      * <p>
      *     it is inline component and replace token with OmegaT tag.
@@ -138,7 +148,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      * Accept Strike node.
      * <p>
      *     it is inline component and replace token with
-     *     omegat tag.
+     *     OmegaT tag.
      * </p>
      * @param node
      */
@@ -172,6 +182,24 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         handler.startPara();
         visitChildren(node);
         handler.endPara();
+    }
+
+    /**
+     * Accept Code node.
+     *
+     * @param node
+     */
+    public void visit(final CodeNode node) {
+        int textLen = node.getText().length();
+        int nodeLen = node.getEndIndex() - node.getStartIndex();
+        if (nodeLen - textLen < 3) { // inline code
+            handler.startPara();
+            handler.putMark("`");
+            handler.putEntry(node);
+            handler.putMark("`");
+            handler.endPara();
+        }
+        // FIXME: else code block, ignored currently.
     }
 
 

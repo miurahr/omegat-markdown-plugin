@@ -88,6 +88,7 @@ public class OmegatMarkdownFilter implements IFilter {
         addProtectedPart("**", "b");
         addProtectedPart("__", "i");
         addProtectedPart("~~", "s");
+        addProtectedPart("`", "q");
     }
 
 
@@ -439,6 +440,7 @@ public class OmegatMarkdownFilter implements IFilter {
             protectedParts.add(pp);
         }
     }
+
     /**
      * Reset buffer for Test.
      */
