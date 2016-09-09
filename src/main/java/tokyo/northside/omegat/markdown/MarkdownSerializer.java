@@ -254,7 +254,6 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         }
     }
 
-
     /**
      * Accept Table cess node.
      * @param node
@@ -272,15 +271,16 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final SimpleNode node) {
-        switch(node.getType()) {
+        switch (node.getType()) {
             case Apostrophe:
                 handler.putMark("'", node.getEndIndex());
                 break;
             case Ellipsis:
                 handler.putMark("\u2026", node.getEndIndex());
                 break;
+            default:
+                break;
         }
     }
-
 
 }

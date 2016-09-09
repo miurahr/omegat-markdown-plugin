@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.ow2.asm:asm-debug-all:5.0.2">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-debug-all/5.0.2/5742eaa4eb2f0583b642eb2a2a7597c996139103/asm-debug-all-5.0.2.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.ow2.asm/asm-debug-all/5.0.2/90dc6bd89bd1989906d56bdf0268128a13d94e82/asm-debug-all-5.0.2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

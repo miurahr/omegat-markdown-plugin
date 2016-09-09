@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.google.code.findbugs:findbugs:3.0.1">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/findbugs/3.0.1/7ae69957c437fd71628d3904572170cf80c01551/findbugs-3.0.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.google.code.findbugs/findbugs/3.0.1/1fcda7191b095f945360c1a51abaf6da9c1667c1/findbugs-3.0.1-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

@@ -31,10 +31,10 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -93,7 +93,7 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private List<ProtectedPart> protectedParts = new ArrayList<>();
 
-    protected static final int parserOption = Extensions.ALL;
+    protected static final int PARSER_OPTION = Extensions.ALL;
 
     /**
      * Plugin loader.
@@ -213,10 +213,7 @@ public class OmegatMarkdownFilter implements IFilter {
     public boolean isFileSupported(final File inFile, final Map<String, String> config,
                                    final FilterContext fc) {
         String inEncoding = fc.getInEncoding();
-        try (BufferedReader reader = new BufferedReader(
-                (inEncoding == null)
-                        ? new InputStreamReader(new FileInputStream(inFile))
-                        : new InputStreamReader(new FileInputStream(inFile), inEncoding))) {
+        try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
             String line;
             while ((line = reader.readLine()) != null) {
                 String trimmed = line.trim();
@@ -336,17 +333,18 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     private void processFile(final File inFile, final File outFile, final FilterContext fc)
             throws IOException {
-        try (BufferedReader reader = new BufferedReader(new FileReader(inFile))) {
+        String inEncoding = fc.getInEncoding();
+        try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
             process(reader);
             reader.close();
-            inEncodingLastParsedFile = "UTF-8";
+            if (inEncoding == null) {
+                inEncodingLastParsedFile = Charset.defaultCharset().name();
+            } else {
+                inEncodingLastParsedFile = inEncoding;
+            }
             if (outFile != null) {
                 String outEncoding = getOutputEncoding(fc);
-                try (BufferedWriter outfile = new BufferedWriter(
-                        (outEncoding == null)
-                                ? new OutputStreamWriter(new FileOutputStream(outFile))
-                                : new OutputStreamWriter(new FileOutputStream(outFile),
-                                        outEncoding))) {
+                try (BufferedWriter outfile = getBufferedWriter(outFile, outEncoding)) {
                     outfile.write(outbuf.toString());
                     outfile.flush();
                     outfile.close();
@@ -381,7 +379,7 @@ public class OmegatMarkdownFilter implements IFilter {
         resetOutbuf();
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
-        PegDownProcessor processor = new PegDownProcessor(parserOption);
+        PegDownProcessor processor = new PegDownProcessor(PARSER_OPTION);
         RootNode astRoot = processor.parseMarkdown(handler.getArticle());
         checkArgNotNull(astRoot, "astRoot");
         astRoot.accept(serializer);
@@ -417,7 +415,10 @@ public class OmegatMarkdownFilter implements IFilter {
             return entry;
         } else {
             String translation = entryTranslateCallback.getTranslation(null, entry, null);
-            return translation != null ? translation : entry;
+            if (translation == null) {
+                translation = entry;
+            }
+            return translation;
         }
     }
 
@@ -468,6 +469,28 @@ public class OmegatMarkdownFilter implements IFilter {
             pp.setReplacementMatchCalculation(replace);
             protectedParts.add(pp);
         }
+    }
+
+    private BufferedReader getBufferedReader(final File inFile, final String inEncoding)
+            throws IOException {
+        InputStreamReader isr;
+        if (inEncoding == null) {
+            isr = new InputStreamReader(new FileInputStream(inFile), Charset.defaultCharset());
+        } else {
+            isr = new InputStreamReader(new FileInputStream(inFile), inEncoding);
+        }
+        return new BufferedReader(isr);
+    }
+
+    private BufferedWriter getBufferedWriter(final File outFile, final String outEncoding)
+            throws IOException {
+        OutputStreamWriter osw;
+        if (outEncoding == null) {
+           osw = new OutputStreamWriter(new FileOutputStream(outFile), Charset.defaultCharset());
+        } else {
+            osw = new OutputStreamWriter(new FileOutputStream(outFile), outEncoding);
+        }
+        return new BufferedWriter(osw);
     }
 
     /**
