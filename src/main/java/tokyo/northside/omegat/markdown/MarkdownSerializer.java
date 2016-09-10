@@ -141,11 +141,11 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final VerbatimNode node) {
-        handler.putMarkOut("```\n");
+        handler.putMarkOut("\n```\n");
         handler.startPara();
         handler.putEntry(node);
         handler.endPara();
-        handler.putMarkOut("```");
+        handler.putMarkOut("```\n");
     }
 
     /**
