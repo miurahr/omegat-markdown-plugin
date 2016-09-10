@@ -25,57 +25,15 @@
 
 package tokyo.northside.omegat.markdown;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Mock of OmegatMarkdownFilter.
- * Created by miurahr on 16/09/08.
+ * Status of markdown printing.
  */
+public enum MarkdownState {
+    NORMAL, VERBATIM, BLOCKQUOTE;
 
-public class MockFilter extends OmegatMarkdownFilter {
-    private List<String> entries = new ArrayList<>();
+    public final int flag;
 
-    public MockFilter() {
-        super();
-        printer = new MockPrinter();
-    }
-
-    /**
-     * Mock for putEntry()
-     * <p>
-     * Store to local variable instead of writing file.
-     * It don't call translation.
-     *
-     * @param text entry text
-     * @param trans entry to be translated.
-     */
-    @Override
-    void writeTranslate(final String text, final boolean trans) {
-        if (trans) {
-            entries.add(text);
-        }
-        try {
-            printer.write(text);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    void setMode(final int status) {
-        printer.setMode(status);
-    }
-
-    /** for test */
-    List<String> getEntries() {
-        return entries;
-    }
-
-    /**
-     * Get buffer contents for Test.
-     */
-    String getOutbuf() {
-        return printer.getOutput();
+    MarkdownState() {
+        this.flag = 1 << this.ordinal();
     }
 }

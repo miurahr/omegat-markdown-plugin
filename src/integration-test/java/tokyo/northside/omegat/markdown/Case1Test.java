@@ -78,8 +78,8 @@ public class Case1Test extends TestFilterBase {
         expected.add("Another important note is that you **must not use '.' in your bucket names**. Otherwise the wildcard certificate for AWS S3 cannot be resolved. This is a limitation on AWS.");
         expected.add("`host` is the address and port of the S3-compatible service. You cannot prepend \"http\" or \"https\" to the `host` option. By default it'll use http connections. If you want to use https connection, please set `use_https = true` option.");
         expected.add("`path_style_request` asks Seafile to use URLs like `https://192.168.1.123:8080/bucketname/object` to access objects. In Amazon S3, the default URL format is in virtual host style, such as `https://bucketname.s3.amazonaws.com/object`. But this style relies on advanced DNS server setup. So most S3-compatible storage systems only implement the path style format.");
-        throw new SkipException("Skip acceptance test.(known bug)");
-        //assertEquals(entries, expected);
+        //throw new SkipException("Skip acceptance test.(known bug)");
+        assertEquals(entries, expected);
     }
 
     @Test

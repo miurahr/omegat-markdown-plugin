@@ -25,24 +25,7 @@
 
 package tokyo.northside.omegat.markdown;
 
-import org.pegdown.ast.AnchorLinkNode;
-import org.pegdown.ast.AutoLinkNode;
-import org.pegdown.ast.CodeNode;
-import org.pegdown.ast.ExpLinkNode;
-import org.pegdown.ast.HeaderNode;
-import org.pegdown.ast.HtmlBlockNode;
-import org.pegdown.ast.InlineHtmlNode;
-import org.pegdown.ast.ListItemNode;
-import org.pegdown.ast.MailLinkNode;
-import org.pegdown.ast.ParaNode;
-import org.pegdown.ast.SimpleNode;
-import org.pegdown.ast.SpecialTextNode;
-import org.pegdown.ast.StrikeNode;
-import org.pegdown.ast.StrongEmphSuperNode;
-import org.pegdown.ast.TableCellNode;
-import org.pegdown.ast.TextNode;
-import org.pegdown.ast.VerbatimNode;
-import org.pegdown.ast.Visitor;
+import org.pegdown.ast.*;
 
 
 /**
@@ -141,11 +124,9 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final VerbatimNode node) {
-        handler.putMarkOut("\n```\n");
-        handler.startPara();
+        handler.startPara(MarkdownState.VERBATIM);
         handler.putEntry(node);
         handler.endPara();
-        handler.putMarkOut("```\n");
     }
 
     /**
@@ -154,7 +135,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ParaNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -165,7 +146,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ListItemNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -179,7 +160,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final StrongEmphSuperNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark(node.getChars(), node.getStartIndex() + node.getChars().length());
         visitChildren(node);
         handler.putMark(node.getChars(), node.getEndIndex());
@@ -196,7 +177,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final StrikeNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark(node.getChars(), node.getStartIndex() + node.getChars().length());
         visitChildren(node);
         handler.putMark(node.getChars(), node.getEndIndex());
@@ -213,7 +194,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ExpLinkNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark("[", node.getStartIndex() + 1);
         visitChildren(node);
         handler.putMark("](");
@@ -231,7 +212,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final HeaderNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -246,7 +227,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         int textLen = node.getText().length();
         int nodeLen = node.getEndIndex() - node.getStartIndex();
         if (nodeLen - textLen == 2) { // inline code
-            handler.startPara();
+            handler.startPara(MarkdownState.NORMAL);
             handler.putMark("`");
             handler.putEntry(node);
             handler.putMark("`");
@@ -256,11 +237,21 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
 
     /**
      * Accept Table cess node.
-     * @param node
+     * @param node table node.
      */
     @Override
     public void visit(final TableCellNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
+        visitChildren(node);
+        handler.endPara();
+    }
+
+    /**
+     * Accept Block quote node.
+     * @param node block quote.
+     */
+    public void visit(final BlockQuoteNode node) {
+        handler.startPara(MarkdownState.BLOCKQUOTE);
         visitChildren(node);
         handler.endPara();
     }
@@ -277,6 +268,9 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
                 break;
             case Ellipsis:
                 handler.putMark("\u2026", node.getEndIndex());
+                break;
+            case Linebreak:
+                handler.putEntry("\n", node.getEndIndex());
                 break;
             default:
                 break;

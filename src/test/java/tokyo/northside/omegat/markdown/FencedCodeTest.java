@@ -91,8 +91,8 @@ public class FencedCodeTest {
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
-        throw new SkipException("Skip test.(known bug)");
-        // assertEquals(filter.getOutbuf(), testInput);
+        //throw new SkipException("Skip test.(known bug)");
+        assertEquals(filter.getOutbuf(), testInput);
     }
 
 }
