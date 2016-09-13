@@ -27,10 +27,30 @@ package tokyo.northside.omegat.markdown;
 
 /**
  * Status of markdown printing.
+ * <p>
+ *     It can has multiple status at once.
+ *     ex. verbatim inside block-quote.
+ *     So it can be treated as flags.
+ * </p>
  */
 public enum MarkdownState {
-    NORMAL, VERBATIM, BLOCKQUOTE;
+    /**
+     * Normal printing.
+     */
+    NORMAL,
+    /**
+     * Verbatim printing.
+     */
+    VERBATIM,
 
+    /**
+     * Block quote printing.
+     */
+    BLOCKQUOTE;
+
+    /**
+     * Indicate flag value of selection.
+     */
     public final int flag;
 
     MarkdownState() {

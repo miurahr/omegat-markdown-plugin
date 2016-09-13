@@ -25,8 +25,6 @@
 
 package tokyo.northside.omegat.markdown;
 
-import org.omegat.util.NullBufferedWriter;
-
 import java.io.BufferedWriter;
 import java.io.IOException;
 
@@ -34,16 +32,14 @@ import java.io.IOException;
  * Markdown printer from MarkdownEntries to output.
  * @Author Hiroshi Miura
  */
-public class MockPrinter extends MarkdownPrinter {
-    private MarkdownState status;
-    private String lineFeed;
+class MockPrinter extends MarkdownPrinter {
     private StringBuilder sb;
 
-    public MockPrinter() {
+    MockPrinter() {
         this(new StringBuilder(), "\n");
     }
 
-    public MockPrinter(final BufferedWriter writer, final String lineFeed) {
+    MockPrinter(final BufferedWriter writer, final String lineFeed) {
         this(new StringBuilder(), lineFeed);
     }
 
@@ -53,14 +49,13 @@ public class MockPrinter extends MarkdownPrinter {
      * @param sb  to be write.
      * @param lineFeed LF character, "\n" or "\r\n"
      */
-    public MockPrinter(final StringBuilder sb, final String lineFeed) {
+    MockPrinter(final StringBuilder sb, final String lineFeed) {
         this.sb = sb;
-        status = MarkdownState.NORMAL;
         this.lineFeed = lineFeed;
     }
 
     @Override
-    public void write(final String entry) throws IOException {
+    void write(final String entry) throws IOException {
         String out = replaceEntry(entry);
         sb.append(out);
     }

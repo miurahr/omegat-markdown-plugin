@@ -25,7 +25,25 @@
 
 package tokyo.northside.omegat.markdown;
 
-import org.pegdown.ast.*;
+import org.pegdown.ast.AnchorLinkNode;
+import org.pegdown.ast.AutoLinkNode;
+import org.pegdown.ast.BlockQuoteNode;
+import org.pegdown.ast.CodeNode;
+import org.pegdown.ast.ExpLinkNode;
+import org.pegdown.ast.HeaderNode;
+import org.pegdown.ast.HtmlBlockNode;
+import org.pegdown.ast.InlineHtmlNode;
+import org.pegdown.ast.ListItemNode;
+import org.pegdown.ast.MailLinkNode;
+import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.SimpleNode;
+import org.pegdown.ast.SpecialTextNode;
+import org.pegdown.ast.StrikeNode;
+import org.pegdown.ast.StrongEmphSuperNode;
+import org.pegdown.ast.TableCellNode;
+import org.pegdown.ast.TextNode;
+import org.pegdown.ast.VerbatimNode;
+import org.pegdown.ast.Visitor;
 
 
 /**

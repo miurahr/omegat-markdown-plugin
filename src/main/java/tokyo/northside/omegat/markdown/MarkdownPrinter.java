@@ -29,22 +29,29 @@ import org.omegat.util.NullBufferedWriter;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.regex.Pattern;
 
 /**
  * Markdown printer from MarkdownEntries to output.
- * @Author Hiroshi Miura
+ * @author Hiroshi Miura
  */
-public class MarkdownPrinter {
-    private int status;
-    private String lineFeed;
+class MarkdownPrinter {
+    private int status = MarkdownState.NORMAL.flag;
+    protected String lineFeed;
     private BufferedWriter writer;
 
-    public MarkdownPrinter() {
+    /**
+     * A Markdown printer to produce markdown file according to status.
+     * Default construction with Null writer.
+     */
+    MarkdownPrinter() {
         this(new NullBufferedWriter(), "\n");
     }
 
-    public MarkdownPrinter(final BufferedWriter writer) {
+    /**
+     * Constructor with specified writer.
+     * @param writer buffered writer to output.
+     */
+    MarkdownPrinter(final BufferedWriter writer) {
         this(writer, "\n");
     }
 
@@ -54,19 +61,18 @@ public class MarkdownPrinter {
      * @param writer BufferedWriter to be write.
      * @param lineFeed LF character, "\n" or "\r\n"
      */
-    public MarkdownPrinter(final BufferedWriter writer, final String lineFeed) {
+    MarkdownPrinter(final BufferedWriter writer, final String lineFeed) {
         this.writer = writer;
-        status = MarkdownState.NORMAL.flag;
         this.lineFeed = lineFeed;
     }
 
-    public void write(final String entry) throws IOException {
+    void write(final String entry) throws IOException {
         String out = replaceEntry(entry);
         writer.write(out);
     }
 
-    public void setMode(final int status) {
-        this.status = status;
+    void setMode(final int val) {
+        this.status = val;
     }
 
     protected String replaceEntry(final String text) {
@@ -84,10 +90,10 @@ public class MarkdownPrinter {
         if (status == MarkdownState.NORMAL.flag) {
             sb.append(text);
         }
-        return sb.toString();
+        return sb.toString().replaceAll("\\n", lineFeed);
     }
 
-    /** Interface for debug */
+    /** Interface for debug. */
     protected String getOutput() {
         return "";
     }
