@@ -35,7 +35,11 @@ import org.pegdown.ast.HtmlBlockNode;
 import org.pegdown.ast.InlineHtmlNode;
 import org.pegdown.ast.ListItemNode;
 import org.pegdown.ast.MailLinkNode;
+import org.pegdown.ast.Node;
 import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.RefLinkNode;
+import org.pegdown.ast.ReferenceNode;
+import org.pegdown.ast.RootNode;
 import org.pegdown.ast.SimpleNode;
 import org.pegdown.ast.SpecialTextNode;
 import org.pegdown.ast.StrikeNode;
@@ -58,6 +62,17 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     }
 
     /**
+     * Accept root node.
+     *
+     * @param node root node.
+     */
+    public void visit(final RootNode node) {
+        visitChildren(node);
+        //node.getReferences().stream().forEachOrdered(this::visitChildren);
+        //node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
+    }
+
+    /**
      * Accept text node.
      * <p>
      *     put literals to translation entry.
@@ -72,11 +87,15 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      * Accept Anchor link node.
      * <p>
      *     put literals to translation entry.
+     *     Header is recognized as anchor link.
+     *
      * @param node link node.
      */
     @Override
     public void visit(final AnchorLinkNode node) {
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         handler.putEntry(node);
+        handler.endPara();
     }
 
     /**
@@ -142,7 +161,11 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final VerbatimNode node) {
-        handler.startPara(MarkdownState.VERBATIM);
+        if (handler.getChars(node.getStartIndex(), 3).equals("```")) {
+            handler.startPara(node.getStartIndex(), MarkdownState.FENCED);
+        } else {
+            handler.startPara(MarkdownState.VERBATIM);
+        }
         handler.putEntry(node);
         handler.endPara();
     }
@@ -153,7 +176,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ParaNode node) {
-        handler.startPara(MarkdownState.NORMAL);
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -164,7 +187,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ListItemNode node) {
-        handler.startPara(MarkdownState.NORMAL);
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -230,7 +253,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final HeaderNode node) {
-        handler.startPara(MarkdownState.NORMAL);
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -293,6 +316,21 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
             default:
                 break;
         }
+    }
+
+    public void visit(final ReferenceNode node) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(node.getUrl()).append(" \"").append(node.getTitle()).append("\"");
+        handler.putEntry(sb.toString(), node.getStartIndex());
+    }
+
+    public void visit(final RefLinkNode node) {
+        handler.putMark("[");
+        visitChildren(node);
+        handler.putMark("]");
+        handler.putMark("[");
+        visitChildren(node.referenceKey);
+        handler.putMark("]");
     }
 
 }

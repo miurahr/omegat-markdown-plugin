@@ -82,6 +82,8 @@ class MarkdownPrinter {
             sb.append("\t");
             tmp = text.replaceAll("\\n", "\n\t");
             sb.append(tmp);
+        } else if ((status & MarkdownState.FENCED.flag) > 0) {
+            sb.append("```\n").append(text).append("```");
         } else if ((status & MarkdownState.BLOCKQUOTE.flag) > 0) {
             tmp = text.replaceAll("(.+)(\n)(.*)", "$1\n> $3");
             sb.append(tmp);

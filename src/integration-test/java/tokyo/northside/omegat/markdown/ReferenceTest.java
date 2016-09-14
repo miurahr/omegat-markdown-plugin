@@ -2,7 +2,6 @@ package tokyo.northside.omegat.markdown;
 
 import static org.testng.Assert.*;
 
-import org.testng.SkipException;
 import org.testng.annotations.Test;
 
 import java.util.ArrayList;
@@ -21,13 +20,12 @@ public class ReferenceTest extends TestFilterBase {
         List<String> expected = new ArrayList<>();
         expected.add("Reference test");
         expected.add("please first read [S3 bucket naming rules][1].\n" +
-                "Note especially not to use **UPPERCASE** letters \n" +
+                "Note especially not to use **UPPERCASE** letters\n" +
                 "in bucket names (don't use camel style names, such as MyCommitOjbects).");
         expected.add("Run and Test");
         expected.add("Now you can start command by `./cmd.sh start`.");
         expected.add("http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html \"the bucket naming rules\"");
-        throw new SkipException("Skip reference test.(known bug)");
-        //assertEquals(entries, expected);
+        assertEquals(entries, expected);
     }
 
     @Test

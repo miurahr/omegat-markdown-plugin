@@ -57,6 +57,27 @@ class EntryHandler {
     }
 
     /**
+     * Return specified Strings.
+     */
+    String getChars(final int index, final int length) {
+         char[] buf = new char[length];
+         System.arraycopy(articleBuf, index, buf, 0, length);
+         return String.valueOf(buf);
+    }
+
+    void startPara(final int index, final MarkdownState status) {
+        if (index - currentBufPosition > 0) {
+            char[] buf = new char[index - currentBufPosition];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, index - currentBufPosition);
+            String token = String.valueOf(buf);
+            filter.writeTranslate(token, false);
+            currentBufPosition = index;
+        }
+        startPara(status);
+
+    }
+
+    /**
      * Start paragraph.
      */
     void startPara(final MarkdownState status) {
@@ -90,21 +111,8 @@ class EntryHandler {
      */
     void putEntry(final TextNode node) {
         String text = node.getText();
-        int start = node.getStartIndex();
-        int end = node.getEndIndex();
-        putEntry(text, start, end);
-     }
-
-     void putEntry(final  String text, final int start, final int end) {
-         if (start - currentBufPosition > 0) {
-             char[] buf = new char[start - currentBufPosition];
-             System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-             String token = String.valueOf(buf);
-             filter.writeTranslate(token, false);
-             putEntry(text, end);
-         } else if (start - currentBufPosition == 0) {
-             putEntry(text, end);
-         }
+        putEntry(text);
+        currentBufPosition = node.getEndIndex();
      }
 
     /**
@@ -115,16 +123,6 @@ class EntryHandler {
     void putEntry(final String text, final int index) {
         putEntry(text);
         currentBufPosition = index;
-    }
-
-    void putEntry(final int start, final int end) {
-        if (currentBufPosition < start) {
-            char[] buf = new char[start - end];
-            System.arraycopy(articleBuf, start, buf, 0, start - end);
-            String token = String.valueOf(buf);
-            putEntry(token);
-            currentBufPosition = end;
-        }
     }
 
     /**

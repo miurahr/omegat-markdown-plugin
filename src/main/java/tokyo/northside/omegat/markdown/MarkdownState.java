@@ -44,6 +44,11 @@ public enum MarkdownState {
     VERBATIM,
 
     /**
+     * Fenced quote (```).
+     */
+    FENCED,
+
+    /**
      * Block quote printing.
      */
     BLOCKQUOTE;

@@ -77,21 +77,14 @@ abstract class AbstractMarkdownSerializer implements Visitor {
     }
 
     /**
-     * Accept root node.
-     *
-     * @param node root node.
-     */
-    public void visit(final RootNode node) {
-        node.getReferences().stream().forEachOrdered(this::visitChildren);
-        node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
-        visitChildren(node);
-    }
-
-    /**
-     * Accept other nodes which should visit children.
+     * Accept nodes which should visit children.
      *
      * @param node super node.
      */
+    public void visit(final RootNode node) {
+        visitChildren(node);
+    }
+
     public void visit(final BlockQuoteNode node) {
         visitChildren(node);
     }

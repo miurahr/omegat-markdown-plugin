@@ -96,6 +96,8 @@ public class OmegatMarkdownFilter implements IFilter {
 
     protected MarkdownPrinter printer;
 
+    private RootNode astRoot;
+
     /**
      * Plugin loader.
      */
@@ -378,7 +380,7 @@ public class OmegatMarkdownFilter implements IFilter {
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
         PegDownProcessor processor = new PegDownProcessor(PARSER_OPTION);
-        RootNode astRoot = processor.parseMarkdown(article);
+        astRoot = processor.parseMarkdown(article);
         checkArgNotNull(astRoot, "astRoot");
         astRoot.accept(serializer);
         handler.finish();
@@ -505,5 +507,4 @@ public class OmegatMarkdownFilter implements IFilter {
         }
         return new BufferedWriter(osw);
     }
-
 }

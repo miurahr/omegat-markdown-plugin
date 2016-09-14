@@ -81,17 +81,15 @@ public class FencedCodeTest {
 
     @Test
     public void testFencedCode_3() throws Exception {
-        String testInput = "-Install the python `boto`library.It 's needed to access S3 service.\n" +
+        String testInput = "- Install the python `boto`library.It 's needed to access S3 service.\n" +
                 "```\n" +
                 "sudo easy_install boto\n" +
                 "```";
         List<String> expected = new ArrayList<>();
-        expected.add("-Install the python `boto`library.It 's needed to access S3 service.");
-        expected.add("sudo easy_install boto\n");
+        expected.add("Install the python `boto`library.It 's needed to access S3 service.```sudo easy_install boto```");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
-        //throw new SkipException("Skip test.(known bug)");
         assertEquals(filter.getOutbuf(), testInput);
     }
 
