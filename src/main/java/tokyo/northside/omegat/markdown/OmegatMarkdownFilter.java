@@ -293,7 +293,8 @@ public class OmegatMarkdownFilter implements IFilter {
         entryAlignCallback = callback;
         processOptions = config;
         try {
-            // TODO: Implement me
+            // TODO: Implement me.
+            System.err.println("Not implemented yet.");
         } finally {
             entryAlignCallback = null;
             processOptions = null;

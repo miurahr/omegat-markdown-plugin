@@ -35,7 +35,6 @@ import org.pegdown.ast.HtmlBlockNode;
 import org.pegdown.ast.InlineHtmlNode;
 import org.pegdown.ast.ListItemNode;
 import org.pegdown.ast.MailLinkNode;
-import org.pegdown.ast.Node;
 import org.pegdown.ast.ParaNode;
 import org.pegdown.ast.RefLinkNode;
 import org.pegdown.ast.ReferenceNode;
