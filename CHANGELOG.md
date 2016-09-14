@@ -2,6 +2,8 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+
+## 0.3 -2016-09-14
 ### Add
 - Integration/Acceptance test.
 - Support Table.
@@ -30,5 +32,6 @@ All notable changes to this project will be documented in this file.
 - Generate markdown translated files.
 - Unit tests.
 
-[Unreleased]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.2...HEAD
+[Unreleased]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.3...HEAD
+[0.3]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.2...v0.3
 [0.2]: https://github.com/miurahr/omegat-markdown-plugin/compare/v0.1...v0.2
