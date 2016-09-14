@@ -50,4 +50,19 @@ public class QuoteTest {
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);
     }
+
+    @Test
+    public void testQuote_multi() throws Exception {
+        String testInput = "Here is multiple lines of quote:\n" +
+                "\n" +
+                "> quote 1\n" +
+                "> quote 2\n\n";
+        List<String> expected = new ArrayList<>();
+        expected.add("Here is multiple lines of quote:");
+        expected.add("quote 1\nquote 2");
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
 }

@@ -25,57 +25,40 @@
 
 package tokyo.northside.omegat.markdown;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-
 /**
- * Mock of OmegatMarkdownFilter.
- * Created by miurahr on 16/09/08.
+ * Status of markdown printing.
+ * <p>
+ *     It can has multiple status at once.
+ *     ex. verbatim inside block-quote.
+ *     So it can be treated as flags.
+ * </p>
  */
-
-public class MockFilter extends OmegatMarkdownFilter {
-    private List<String> entries = new ArrayList<>();
-
-    public MockFilter() {
-        super();
-        printer = new MockPrinter();
-    }
+public enum MarkdownState {
+    /**
+     * Normal printing.
+     */
+    NORMAL,
+    /**
+     * Verbatim printing.
+     */
+    VERBATIM,
 
     /**
-     * Mock for putEntry()
-     * <p>
-     * Store to local variable instead of writing file.
-     * It don't call translation.
-     *
-     * @param text entry text
-     * @param trans entry to be translated.
+     * Fenced quote (```).
      */
-    @Override
-    void writeTranslate(final String text, final boolean trans) {
-        if (trans) {
-            entries.add(text);
-        }
-        try {
-            printer.write(text);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
-    }
-
-    void setMode(final int status) {
-        printer.setMode(status);
-    }
-
-    /** for test */
-    List<String> getEntries() {
-        return entries;
-    }
+    FENCED,
 
     /**
-     * Get buffer contents for Test.
+     * Block quote printing.
      */
-    String getOutbuf() {
-        return printer.getOutput();
+    BLOCKQUOTE;
+
+    /**
+     * Indicate flag value of selection.
+     */
+    public final int flag;
+
+    MarkdownState() {
+        this.flag = 1 << this.ordinal();
     }
 }

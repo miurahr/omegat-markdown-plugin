@@ -27,6 +27,7 @@ package tokyo.northside.omegat.markdown;
 
 import org.pegdown.ast.AnchorLinkNode;
 import org.pegdown.ast.AutoLinkNode;
+import org.pegdown.ast.BlockQuoteNode;
 import org.pegdown.ast.CodeNode;
 import org.pegdown.ast.ExpLinkNode;
 import org.pegdown.ast.HeaderNode;
@@ -35,6 +36,9 @@ import org.pegdown.ast.InlineHtmlNode;
 import org.pegdown.ast.ListItemNode;
 import org.pegdown.ast.MailLinkNode;
 import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.RefLinkNode;
+import org.pegdown.ast.ReferenceNode;
+import org.pegdown.ast.RootNode;
 import org.pegdown.ast.SimpleNode;
 import org.pegdown.ast.SpecialTextNode;
 import org.pegdown.ast.StrikeNode;
@@ -57,6 +61,17 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     }
 
     /**
+     * Accept root node.
+     *
+     * @param node root node.
+     */
+    public void visit(final RootNode node) {
+        visitChildren(node);
+        //node.getReferences().stream().forEachOrdered(this::visitChildren);
+        //node.getAbbreviations().stream().forEachOrdered(this::visitChildren);
+    }
+
+    /**
      * Accept text node.
      * <p>
      *     put literals to translation entry.
@@ -71,11 +86,15 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      * Accept Anchor link node.
      * <p>
      *     put literals to translation entry.
+     *     Header is recognized as anchor link.
+     *
      * @param node link node.
      */
     @Override
     public void visit(final AnchorLinkNode node) {
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         handler.putEntry(node);
+        handler.endPara();
     }
 
     /**
@@ -141,11 +160,13 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final VerbatimNode node) {
-        handler.putMarkOut("\n```\n");
-        handler.startPara();
+        if (handler.getChars(node.getStartIndex(), 3).equals("```")) {
+            handler.startPara(node.getStartIndex(), MarkdownState.FENCED);
+        } else {
+            handler.startPara(MarkdownState.VERBATIM);
+        }
         handler.putEntry(node);
         handler.endPara();
-        handler.putMarkOut("```\n");
     }
 
     /**
@@ -154,7 +175,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ParaNode node) {
-        handler.startPara();
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -165,7 +186,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ListItemNode node) {
-        handler.startPara();
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -179,7 +200,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final StrongEmphSuperNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark(node.getChars(), node.getStartIndex() + node.getChars().length());
         visitChildren(node);
         handler.putMark(node.getChars(), node.getEndIndex());
@@ -196,7 +217,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final StrikeNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark(node.getChars(), node.getStartIndex() + node.getChars().length());
         visitChildren(node);
         handler.putMark(node.getChars(), node.getEndIndex());
@@ -213,7 +234,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final ExpLinkNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
         handler.putMark("[", node.getStartIndex() + 1);
         visitChildren(node);
         handler.putMark("](");
@@ -231,7 +252,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final HeaderNode node) {
-        handler.startPara();
+        handler.startPara(node.getStartIndex(), MarkdownState.NORMAL);
         visitChildren(node);
         handler.endPara();
     }
@@ -246,7 +267,7 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         int textLen = node.getText().length();
         int nodeLen = node.getEndIndex() - node.getStartIndex();
         if (nodeLen - textLen == 2) { // inline code
-            handler.startPara();
+            handler.startPara(MarkdownState.NORMAL);
             handler.putMark("`");
             handler.putEntry(node);
             handler.putMark("`");
@@ -256,11 +277,21 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
 
     /**
      * Accept Table cess node.
-     * @param node
+     * @param node table node.
      */
     @Override
     public void visit(final TableCellNode node) {
-        handler.startPara();
+        handler.startPara(MarkdownState.NORMAL);
+        visitChildren(node);
+        handler.endPara();
+    }
+
+    /**
+     * Accept Block quote node.
+     * @param node block quote.
+     */
+    public void visit(final BlockQuoteNode node) {
+        handler.startPara(MarkdownState.BLOCKQUOTE);
         visitChildren(node);
         handler.endPara();
     }
@@ -278,9 +309,27 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
             case Ellipsis:
                 handler.putMark("\u2026", node.getEndIndex());
                 break;
+            case Linebreak:
+                handler.putEntry("\n", node.getEndIndex());
+                break;
             default:
                 break;
         }
+    }
+
+    public void visit(final ReferenceNode node) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(node.getUrl()).append(" \"").append(node.getTitle()).append("\"");
+        handler.putEntry(sb.toString(), node.getStartIndex());
+    }
+
+    public void visit(final RefLinkNode node) {
+        handler.putMark("[");
+        visitChildren(node);
+        handler.putMark("]");
+        handler.putMark("[");
+        visitChildren(node.referenceKey);
+        handler.putMark("]");
     }
 
 }

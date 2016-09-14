@@ -25,57 +25,38 @@
 
 package tokyo.northside.omegat.markdown;
 
+import org.omegat.util.NullBufferedWriter;
+
+import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
- * Mock of OmegatMarkdownFilter.
- * Created by miurahr on 16/09/08.
+ * Markdown printer from MarkdownEntries to output.
+ * @Author Hiroshi Miura
  */
+class MockPrinter extends MarkdownPrinter {
+    private StringBuilder sb = new StringBuilder();
 
-public class MockFilter extends OmegatMarkdownFilter {
-    private List<String> entries = new ArrayList<>();
-
-    public MockFilter() {
-        super();
-        printer = new MockPrinter();
+    MockPrinter() {
+        this("\n");
     }
 
     /**
-     * Mock for putEntry()
-     * <p>
-     * Store to local variable instead of writing file.
-     * It don't call translation.
+     * Constructor with writer and LF string.
      *
-     * @param text entry text
-     * @param trans entry to be translated.
+     * @param lineFeed LF character, "\n" or "\r\n"
      */
+    MockPrinter(final String lineFeed) {
+        super(new NullBufferedWriter(), lineFeed);
+    }
+
     @Override
-    void writeTranslate(final String text, final boolean trans) {
-        if (trans) {
-            entries.add(text);
-        }
-        try {
-            printer.write(text);
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
-        }
+    void write(final String entry) throws IOException {
+        String out = replaceEntry(entry);
+        sb.append(out);
     }
 
-    void setMode(final int status) {
-        printer.setMode(status);
-    }
-
-    /** for test */
-    List<String> getEntries() {
-        return entries;
-    }
-
-    /**
-     * Get buffer contents for Test.
-     */
-    String getOutbuf() {
-        return printer.getOutput();
+    protected String getOutput() {
+        return sb.toString();
     }
 }

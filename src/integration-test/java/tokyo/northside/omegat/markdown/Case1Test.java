@@ -27,6 +27,7 @@ package tokyo.northside.omegat.markdown;
 
 import static org.testng.Assert.*;
 
+import org.pegdown.ast.RootNode;
 import org.testng.SkipException;
 import org.testng.annotations.*;
 

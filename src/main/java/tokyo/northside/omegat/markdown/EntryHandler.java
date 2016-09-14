@@ -27,6 +27,8 @@ package tokyo.northside.omegat.markdown;
 
 import org.pegdown.ast.TextNode;
 
+import java.util.Stack;
+
 
 /**
  * Entry Handler for PegDown Markdown parser.
@@ -38,10 +40,10 @@ class EntryHandler {
 
     private OmegatMarkdownFilter filter;
     private char[] articleBuf;
+    private StringBuilder sb;
     private int currentBufPosition;
-
-    private StringBuilder entryBuf;
     private int para;
+    private Stack<Integer> st = new Stack<>();
 
     EntryHandler(final OmegatMarkdownFilter filter, final char[] article) {
         this.filter = filter;
@@ -49,22 +51,42 @@ class EntryHandler {
         articleBuf = article;
         currentBufPosition = 0;
 
-        entryBuf = new StringBuilder();
         para = 0;
+        st.empty();
+        st.push(MarkdownState.NORMAL.flag);
     }
 
     /**
-     * Get source article.
-     * @return source article i.
+     * Return specified Strings.
      */
-    char[] getArticle() {
-        return articleBuf;
+    String getChars(final int index, final int length) {
+         char[] buf = new char[length];
+         System.arraycopy(articleBuf, index, buf, 0, length);
+         return String.valueOf(buf);
+    }
+
+    void startPara(final int index, final MarkdownState status) {
+        if (index - currentBufPosition > 0) {
+            char[] buf = new char[index - currentBufPosition];
+            System.arraycopy(articleBuf, currentBufPosition, buf, 0, index - currentBufPosition);
+            String token = String.valueOf(buf);
+            filter.writeTranslate(token, false);
+            currentBufPosition = index;
+        }
+        startPara(status);
+
     }
 
     /**
      * Start paragraph.
      */
-    void startPara() {
+    void startPara(final MarkdownState status) {
+        int currentState = st.peek();
+        st.push(currentState | status.flag);
+        filter.setMode(st.peek());
+        if (para == 0) {
+            sb = new StringBuilder();
+        }
         para++;
     }
 
@@ -74,10 +96,13 @@ class EntryHandler {
     void endPara() {
         para--;
         if (para <= 0) {
-            filter.writeTranslate(entryBuf.toString(), true);
-            entryBuf = new StringBuilder();
+            putEntry(sb.toString());
             para = 0;
+            st.empty();
+            st.push(MarkdownState.NORMAL.flag);
         }
+        st.pop();
+        filter.setMode(st.peek());
     }
 
     /**
@@ -86,18 +111,8 @@ class EntryHandler {
      */
     void putEntry(final TextNode node) {
         String text = node.getText();
-        int start = node.getStartIndex();
-        int end = node.getEndIndex();
-
-        if (start - currentBufPosition > 0) {
-            char[] buf = new char[start - currentBufPosition];
-            System.arraycopy(articleBuf, currentBufPosition, buf, 0, start - currentBufPosition);
-            String token = String.valueOf(buf);
-            filter.writeTranslate(token, false);
-            putEntry(text, end);
-        } else if (start - currentBufPosition == 0) {
-            putEntry(text, end);
-        }
+        putEntry(text);
+        currentBufPosition = node.getEndIndex();
      }
 
     /**
@@ -115,11 +130,11 @@ class EntryHandler {
      * @param text
      */
     void putEntry(final String text) {
-        if (para > 0) {
-            entryBuf.append(text);
+         if (para > 0) {
+            sb.append(text);
         } else {
-            filter.writeTranslate(text, true);
-        }
+             filter.writeTranslate(text, true);
+         }
     }
 
     /**
@@ -130,12 +145,6 @@ class EntryHandler {
     void putMark(final String chars, final int next) {
         putMark(chars);
         currentBufPosition = next;
-    }
-
-    void putMarkOut(final String chars) {
-        if (para == 0) {
-            filter.writeTranslate(chars, false);
-        }
     }
 
     /**

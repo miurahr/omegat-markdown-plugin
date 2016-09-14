@@ -48,6 +48,10 @@ dependencies {
 }
 test.useTestNG()
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
+}
+
 jar {
     from files(sourceSets.main.output.classesDir)
     from {configurations.compile.collect {zipTree(it)}} {

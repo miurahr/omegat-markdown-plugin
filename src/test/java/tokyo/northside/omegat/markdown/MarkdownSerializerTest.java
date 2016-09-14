@@ -88,8 +88,8 @@ public class MarkdownSerializerTest {
         List<String> expected = new ArrayList<>();
         expected.add("HEADING level 1");
         expected.add("Heading with under lines (level2)");
-        expected.add("Normal clause part 1" +
-                "[External link part 1](https://example.com/link/to/external/url)" +
+        expected.add("Normal clause part 1\n" +
+                "[External link part 1](https://example.com/link/to/external/url)\n" +
                 "continuous clause sentense.");
         expected.add("Heading level3 **Bold part 1**");
         expected.add("quote part1\n");
@@ -99,16 +99,19 @@ public class MarkdownSerializerTest {
                 "#\n" +
                 "echo hello world.\n");
         expected.add("Heading level 4");
-        expected.add("Normal clause part 3. ~~strikethroughs~~Test for Styling text **bold and __italic__**");
+        expected.add("Normal clause part 3. ~~strikethroughs~~\n" +
+                "Test for Styling text **bold and __italic__**");
         expected.add("Heading with under lines (level2)");
         expected.add("In the word of abraham");
         expected.add("quote.");
         expected.add("ordered list (1)");
-        expected.add("ordered list (2) multiline");
+        expected.add("ordered list (2)\n" +
+                " multiline");
         expected.add("<!-- HTML style comment -->");
         expected.add("unordered list (1)");
         expected.add("unordered list (2)");
-        expected.add("unordered list (3) continuous line.");
+        expected.add("unordered list (3)\n" +
+                " continuous line.");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);

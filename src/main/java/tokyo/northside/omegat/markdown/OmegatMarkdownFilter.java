@@ -48,6 +48,7 @@ import org.omegat.filters2.IFilter;
 import org.omegat.filters2.IParseCallback;
 import org.omegat.filters2.ITranslateCallback;
 import org.omegat.filters2.Instance;
+import org.omegat.util.NullBufferedWriter;
 
 import org.apache.commons.io.IOUtils;
 import org.pegdown.Extensions;
@@ -89,11 +90,13 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private String inEncodingLastParsedFile;
 
-    private StringBuilder outbuf;
-
-    private List<ProtectedPart> protectedParts = new ArrayList<>();
+    protected List<ProtectedPart> protectedParts = new ArrayList<>();
 
     protected static final int PARSER_OPTION = Extensions.ALL;
+
+    protected MarkdownPrinter printer;
+
+    private RootNode astRoot;
 
     /**
      * Plugin loader.
@@ -290,7 +293,8 @@ public class OmegatMarkdownFilter implements IFilter {
         entryAlignCallback = callback;
         processOptions = config;
         try {
-            // TODO: Implement me
+            // TODO: Implement me.
+            System.err.println("Not implemented yet.");
         } finally {
             entryAlignCallback = null;
             processOptions = null;
@@ -331,25 +335,23 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc      filter context.
      * @throws IOException throes when I/O error happened.
      */
-    private void processFile(final File inFile, final File outFile, final FilterContext fc)
+    protected void processFile(final File inFile, final File outFile, final FilterContext fc)
             throws IOException {
         String inEncoding = fc.getInEncoding();
         try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
-            process(reader);
-            reader.close();
-            if (inEncoding == null) {
-                inEncodingLastParsedFile = Charset.defaultCharset().name();
-            } else {
-                inEncodingLastParsedFile = inEncoding;
-            }
             if (outFile != null) {
                 String outEncoding = getOutputEncoding(fc);
                 try (BufferedWriter outfile = getBufferedWriter(outFile, outEncoding)) {
-                    outfile.write(outbuf.toString());
+                    this.printer = new MarkdownPrinter(outfile);
+                    process(reader);
                     outfile.flush();
                     outfile.close();
                 }
+            } else {
+                this.printer = new MarkdownPrinter(new NullBufferedWriter());
+                process(reader);
             }
+            reader.close();
         }
     }
 
@@ -371,16 +373,15 @@ public class OmegatMarkdownFilter implements IFilter {
      *
      * @param testInput Markdown strings.
      */
-    void process(final String testInput) {
+    void process(final String testInput) throws IOException {
         process(testInput.toCharArray());
     }
 
-    private void process(final char[] article) {
-        resetOutbuf();
+    private void process(final char[] article) throws IOException {
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
         PegDownProcessor processor = new PegDownProcessor(PARSER_OPTION);
-        RootNode astRoot = processor.parseMarkdown(handler.getArticle());
+        astRoot = processor.parseMarkdown(article);
         checkArgNotNull(astRoot, "astRoot");
         astRoot.accept(serializer);
         handler.finish();
@@ -394,13 +395,26 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     void writeTranslate(final String value, final boolean trans) {
         if (!value.isEmpty()) {
+            String result;
             if (trans) {
-                String translated = processEntry(value);
-                outbuf.append(translated);
+                result = processEntry(value);
             } else {
-                outbuf.append(value);
+                result = value;
+            }
+            try {
+                printer.write(result);
+            } catch (IOException e) {
+                System.err.println(e.getMessage());
             }
         }
+    }
+
+    /**
+     * Set printer mode, delete MarkdownPrinter.setMode().
+     * @param status status of printing.
+     */
+    void setMode(final int status) {
+        printer.setMode(status);
     }
 
     /**
@@ -476,8 +490,10 @@ public class OmegatMarkdownFilter implements IFilter {
         InputStreamReader isr;
         if (inEncoding == null) {
             isr = new InputStreamReader(new FileInputStream(inFile), Charset.defaultCharset());
+            inEncodingLastParsedFile = Charset.defaultCharset().name();
         } else {
             isr = new InputStreamReader(new FileInputStream(inFile), inEncoding);
+            inEncodingLastParsedFile = inEncoding;
         }
         return new BufferedReader(isr);
     }
@@ -491,26 +507,5 @@ public class OmegatMarkdownFilter implements IFilter {
             osw = new OutputStreamWriter(new FileOutputStream(outFile), outEncoding);
         }
         return new BufferedWriter(osw);
-    }
-
-    /**
-     * Reset buffer for Test.
-     */
-    void resetOutbuf() {
-        outbuf = new StringBuilder();
-    }
-
-    /**
-     * Get buffer contents for Test.
-     */
-    String getOutbuf() {
-        return outbuf.toString();
-    }
-
-    /**
-     * Append to buffer for test.
-     */
-    void appendOutbuf(final String text) {
-        outbuf.append(text);
     }
 }
