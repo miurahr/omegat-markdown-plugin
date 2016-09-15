@@ -86,7 +86,7 @@ public class FencedCodeTest {
                 "sudo easy_install boto\n" +
                 "```";
         List<String> expected = new ArrayList<>();
-        expected.add("Install the python `boto`library.It 's needed to access S3 service.```sudo easy_install boto```");
+        expected.add("Install the python `boto`library.It 's needed to access S3 service.\n```\nsudo easy_install boto\n```");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         throw new SkipException("Skip acceptance test.(known bug)");

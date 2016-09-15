@@ -12,6 +12,7 @@
     <orderEntry type="module" module-name="omegat-markdown-plugin_main" />
     <orderEntry type="library" name="Gradle: org.pegdown:pegdown:1.6.0" level="project" />
     <orderEntry type="library" name="Gradle: org.testng:testng:6.9.10" level="project" />
+    <orderEntry type="library" name="Gradle: com.alibaba:fastjson:1.2.17" level="project" />
     <orderEntry type="module" module-name="stub_main" />
     <orderEntry type="library" name="Gradle: org.parboiled:parboiled-java:1.1.7" level="project" />
     <orderEntry type="library" name="Gradle: org.beanshell:bsh:2.0b4" level="project" />
