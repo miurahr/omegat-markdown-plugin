@@ -30,14 +30,26 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
- * Created by miurahr on 16/09/08.
+ * Test for quote elements.
+ * @author Hiroshi Miura
  */
-public class TestTest {
+public class SpecialCharTest {
     @Test
-    public void testText_single_quote() throws Exception {
+    public void testDoubleQuote() throws Exception {
+        String testInput = "Here is a \"special character\" embedded.";
+        List<String> expected = new ArrayList<>();
+        expected.add("Here is a \"special character\" embedded.");
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+        assertEquals(filter.getEntries(), expected);
+    }
+
+    @Test
+    public void testSingleQuote() throws Exception {
         String testInput = "Show file differences that **haven't been** staged";
         List<String> expected = new ArrayList<>();
         expected.add(testInput);

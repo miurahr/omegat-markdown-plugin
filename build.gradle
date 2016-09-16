@@ -42,6 +42,7 @@ dependencies {
     provided 'commons-lang:commons-lang:2.6'
     provided project(":stub")
     testCompile 'org.testng:testng:6.9.10'
+    testCompile 'com.alibaba:fastjson:1.2.17'
     testCompile project(":stub")
     integrationTestCompile 'org.testng:testng:6.9.10'
     integrationTestCompile project(":stub")

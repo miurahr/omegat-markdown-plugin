@@ -36,6 +36,7 @@ import org.pegdown.ast.InlineHtmlNode;
 import org.pegdown.ast.ListItemNode;
 import org.pegdown.ast.MailLinkNode;
 import org.pegdown.ast.ParaNode;
+import org.pegdown.ast.QuotedNode;
 import org.pegdown.ast.RefLinkNode;
 import org.pegdown.ast.ReferenceNode;
 import org.pegdown.ast.RootNode;
@@ -105,7 +106,12 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final AutoLinkNode node) {
+        String startmark = handler.getChars(node.getStartIndex(), 1);
+        String endmark = handler.getChars(node.getEndIndex() - 1, 1);
+        handler.putMark(startmark);
         handler.putEntry(node);
+        handler.putMark(endmark);
+
     }
 
     /**
@@ -266,13 +272,14 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     public void visit(final CodeNode node) {
         int textLen = node.getText().length();
         int nodeLen = node.getEndIndex() - node.getStartIndex();
-        if (nodeLen - textLen == 2) { // inline code
-            handler.startPara(MarkdownState.NORMAL);
-            handler.putMark("`");
-            handler.putEntry(node);
-            handler.putMark("`");
-            handler.endPara();
-        }
+        int markLen = (nodeLen - textLen) / 2; // FIXME: odd?
+        String startmark = handler.getChars(node.getStartIndex(), markLen);
+        String endmark = handler.getChars(node.getEndIndex() - markLen, markLen);
+        handler.startPara(MarkdownState.NORMAL);
+        handler.putMark(startmark);
+        handler.putEntry(node);
+        handler.putMark(endmark);
+        handler.endPara();
     }
 
     /**
@@ -312,6 +319,12 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
             case Linebreak:
                 handler.putEntry("\n", node.getEndIndex());
                 break;
+            case Emdash:
+                break;
+            case Endash:
+                break;
+            case Nbsp:
+                break;
             default:
                 break;
         }
@@ -330,6 +343,29 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         handler.putMark("[");
         visitChildren(node.referenceKey);
         handler.putMark("]");
+    }
+
+    public void visit(final QuotedNode node) {
+        String startmark;
+        String endmark;
+        switch (node.getType()) {
+            case Single:
+            case Double:
+                startmark = handler.getChars(node.getStartIndex(), 1);
+                endmark = handler.getChars(node.getEndIndex() - 1, 1);
+                break;
+            case DoubleAngle:
+                startmark = handler.getChars(node.getStartIndex(), 2);
+                endmark = handler.getChars(node.getEndIndex() - 1, 2);
+                break;
+            default:
+                startmark = "";
+                endmark = "";
+                break;
+        }
+        handler.putMark(startmark);
+        visitChildren(node);
+        handler.putMark(endmark);
     }
 
 }

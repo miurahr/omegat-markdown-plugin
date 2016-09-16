@@ -341,7 +341,7 @@ public class OmegatMarkdownFilter implements IFilter {
         try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
             if (outFile != null) {
                 String outEncoding = getOutputEncoding(fc);
-                try (BufferedWriter outfile = getBufferedWriter(outFile, outEncoding)) {
+                try (BufferedWriter outfile = MarkdownFilterUtils.getBufferedWriter(outFile, outEncoding)) {
                     this.printer = new MarkdownPrinter(outfile);
                     process(reader);
                     outfile.flush();
@@ -487,25 +487,12 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private BufferedReader getBufferedReader(final File inFile, final String inEncoding)
             throws IOException {
-        InputStreamReader isr;
+        BufferedReader br = MarkdownFilterUtils.getBufferedReader(inFile, inEncoding);
         if (inEncoding == null) {
-            isr = new InputStreamReader(new FileInputStream(inFile), Charset.defaultCharset());
             inEncodingLastParsedFile = Charset.defaultCharset().name();
         } else {
-            isr = new InputStreamReader(new FileInputStream(inFile), inEncoding);
             inEncodingLastParsedFile = inEncoding;
         }
-        return new BufferedReader(isr);
-    }
-
-    private BufferedWriter getBufferedWriter(final File outFile, final String outEncoding)
-            throws IOException {
-        OutputStreamWriter osw;
-        if (outEncoding == null) {
-           osw = new OutputStreamWriter(new FileOutputStream(outFile), Charset.defaultCharset());
-        } else {
-            osw = new OutputStreamWriter(new FileOutputStream(outFile), outEncoding);
-        }
-        return new BufferedWriter(osw);
+        return br;
     }
 }
