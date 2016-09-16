@@ -272,13 +272,14 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
     public void visit(final CodeNode node) {
         int textLen = node.getText().length();
         int nodeLen = node.getEndIndex() - node.getStartIndex();
-        if (nodeLen - textLen == 2) { // inline code
-            handler.startPara(MarkdownState.NORMAL);
-            handler.putMark("`");
-            handler.putEntry(node);
-            handler.putMark("`");
-            handler.endPara();
-        }
+        int markLen = (nodeLen - textLen) / 2; // FIXME: odd?
+        String startmark = handler.getChars(node.getStartIndex(), markLen);
+        String endmark = handler.getChars(node.getEndIndex() - markLen, markLen);
+        handler.startPara(MarkdownState.NORMAL);
+        handler.putMark(startmark);
+        handler.putEntry(node);
+        handler.putMark(endmark);
+        handler.endPara();
     }
 
     /**

@@ -34,11 +34,16 @@ import org.omegat.filters2.ITranslateCallback;
 
 import org.apache.commons.io.FileUtils;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+
+import com.alibaba.fastjson.JSON;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Base class for test filter parsing.
@@ -49,6 +54,24 @@ public abstract class TestFilterBase  {
     protected FilterContext context = new FilterContext();
 
     protected File outFile;
+
+    protected void test(final String testcase) throws Exception {
+        OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
+        translateText(mdf, testcase + ".md");
+        List<String> entries = parse(mdf, testcase + ".md");
+        try (BufferedReader reader = MarkdownFilterUtils.getBufferedReader(new
+                        File(this.getClass().getResource(testcase + ".json").getFile()),
+                "UTF-8")) {
+            String jsonString = MarkdownFilterUtils.toString(reader);
+            ArrayList expected = JSON.parseObject(jsonString, ArrayList.class);
+            assertEquals(entries, expected, testcase);
+        }
+    }
+
+    protected void testTranslate(final String testcase) throws Exception {
+        OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
+        translateText(mdf, testcase + ".md");
+    }
 
     protected List<String> parse(IFilter filter, String resource) throws Exception {
         return parse(filter, resource, Collections.emptyMap());

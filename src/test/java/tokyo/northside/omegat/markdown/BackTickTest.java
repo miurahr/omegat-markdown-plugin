@@ -30,20 +30,23 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
- * Created by miurahr on 16/09/08.
+ * Test class for Markdown BackTick elements.
+ * @author Hiroshi Miura
  */
-public class TestTest {
+public class BackTickTest {
+
     @Test
-    public void testText_single_quote() throws Exception {
-        String testInput = "Show file differences that **haven't been** staged";
+    public void testVisit_BackTick() throws Exception {
+        String testInput = "Backtick: `` \\` ``";
         List<String> expected = new ArrayList<>();
-        expected.add(testInput);
+        expected.add("Backtick: `` \\` ``");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
-        assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);
+        assertEquals(filter.getEntries(), expected);
     }
-}
+
+ }

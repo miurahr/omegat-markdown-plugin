@@ -34,7 +34,7 @@ import static org.testng.Assert.assertEquals;
 
 /**
  * Test for quote elements.
- * Created by miurahr on 16/09/08.
+ * @author Hiroshi Miura
  */
 public class SpecialCharTest {
     @Test
@@ -46,5 +46,16 @@ public class SpecialCharTest {
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);
+    }
+
+    @Test
+    public void testSingleQuote() throws Exception {
+        String testInput = "Show file differences that **haven't been** staged";
+        List<String> expected = new ArrayList<>();
+        expected.add(testInput);
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getOutbuf(), testInput);
     }
 }

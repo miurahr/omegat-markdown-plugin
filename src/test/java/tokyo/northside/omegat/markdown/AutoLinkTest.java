@@ -27,20 +27,26 @@ package tokyo.northside.omegat.markdown;
 
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.testng.Assert.assertEquals;
 
 /**
  * Test class for Markdown AutoLink elements.
- * Created by miurahr on 16/08/26.
+ * @author Hiroshi Miura
  */
 public class AutoLinkTest {
 
     @Test
     public void testVisit_AutoLink() throws Exception {
         String testInput = "Link: <http://example.com/>.";
+        List<String> expected = new ArrayList<>();
+        expected.add(testInput);
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
+        assertEquals(filter.getEntries(), expected);
     }
 
  }
