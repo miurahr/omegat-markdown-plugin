@@ -44,6 +44,7 @@ import org.omegat.filters2.IFilter;
 import org.omegat.filters2.IParseCallback;
 import org.omegat.filters2.ITranslateCallback;
 import org.omegat.filters2.Instance;
+import org.omegat.filters2.TranslationException;
 import org.omegat.util.NullBufferedWriter;
 
 import org.apache.commons.io.IOUtils;
@@ -257,7 +258,7 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     public final void parseFile(final File inFile, final Map<String, String> config,
                                 final FilterContext fc, final IParseCallback callback)
-            throws IOException {
+            throws IOException, TranslationException {
         entryParseCallback = callback;
         entryTranslateCallback = null;
         entryAlignCallback = null;
@@ -311,7 +312,7 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     public final void translateFile(final File inFile, final File outFile,
                                     final Map<String, String> config, final FilterContext fc,
-                                    final ITranslateCallback callback) throws IOException {
+                                    final ITranslateCallback callback) throws IOException, TranslationException {
         entryParseCallback = null;
         entryTranslateCallback = callback;
         entryAlignCallback = null;
@@ -334,7 +335,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @throws IOException throes when I/O error happened.
      */
     protected void processFile(final File inFile, final File outFile, final FilterContext fc)
-            throws IOException {
+            throws IOException, TranslationException {
         String inEncoding = fc.getInEncoding();
         try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
             if (outFile != null) {
@@ -360,7 +361,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param reader reader specified to source markdown file.
      * @throws IOException throws when I/O error hapened.
      */
-    void process(final BufferedReader reader) throws IOException {
+    void process(final BufferedReader reader) throws IOException, TranslationException {
         process(IOUtils.toCharArray(reader));
     }
 
@@ -372,17 +373,18 @@ public class OmegatMarkdownFilter implements IFilter {
      *
      * @param testInput Markdown strings.
      */
-    void process(final String testInput) throws IOException {
+    void process(final String testInput) throws IOException, TranslationException {
         process(testInput.toCharArray());
     }
 
-    private void process(final char[] article) throws IOException {
+    private void process(final char[] article) throws IOException, TranslationException {
         handler = new EntryHandler(this, article);
         MarkdownSerializer serializer = new MarkdownSerializer(handler);
         PegDownProcessor processor = new PegDownProcessor(PARSER_OPTION);
         astRoot = processor.parseMarkdown(article);
         checkArgNotNull(astRoot, "astRoot");
         astRoot.accept(serializer);
+        // If handler has a exception when process, finish() throws TranslationException
         handler.finish();
     }
 
@@ -414,6 +416,18 @@ public class OmegatMarkdownFilter implements IFilter {
      */
     void setMode(final int status) {
         printer.setMode(status);
+    }
+
+    boolean isMode(MarkdownState state) {
+        return (printer.getMode() & state.flag) > 1;
+    }
+
+    void setFencedLang(final String lang) {
+        printer.setFencedLang(lang);
+    }
+
+    void resetFencedLang() {
+        printer.resetFencedLang();
     }
 
     /**

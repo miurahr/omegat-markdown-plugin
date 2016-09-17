@@ -25,6 +25,7 @@
 
 package tokyo.northside.omegat.markdown;
 
+import org.omegat.filters2.TranslationException;
 import org.pegdown.ast.TextNode;
 
 import java.util.Stack;
@@ -44,8 +45,9 @@ class EntryHandler {
     private int currentBufPosition;
     private int para;
     private Stack<Integer> st = new Stack<>();
+    private boolean exception = false;
 
-    EntryHandler(final OmegatMarkdownFilter filter, final char[] article) {
+    EntryHandler(final OmegatMarkdownFilter filter, final char[] article){
         this.filter = filter;
 
         articleBuf = article;
@@ -59,9 +61,54 @@ class EntryHandler {
      * Return specified Strings.
      */
     String getChars(final int index, final int length) {
-         char[] buf = new char[length];
-         System.arraycopy(articleBuf, index, buf, 0, length);
-         return String.valueOf(buf);
+        char[] buf = new char[length];
+        System.arraycopy(articleBuf, index, buf, 0, length);
+        return String.valueOf(buf);
+    }
+
+    int findFirst(final int index, final char c) {
+        assert (index >= 0);
+        int i;
+        for (i = index; i < articleBuf.length; i++) {
+            if (articleBuf[i] == c) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    void startVerbatim(final int index) {
+        startPara(index, MarkdownState.VERBATIM);
+    }
+
+    void endVerbatim() {
+        endPara();
+    }
+
+    void startFenced(final int start, final String lang) {
+        assert(lang != null);
+        if (para > 0) {
+            int index = start + lang.length() + 4;
+            if (index - currentBufPosition > 0) {
+                char[] buf = new char[index - currentBufPosition];
+                System.arraycopy(articleBuf, currentBufPosition, buf, 0, index - currentBufPosition);
+                String token = String.valueOf(buf);
+                putMark(token);
+                currentBufPosition = index;
+            }
+            startPara(MarkdownState.FENCEDINLINE);
+        } else {
+            filter.setFencedLang(lang);
+            startPara(MarkdownState.FENCED);
+        }
+    }
+
+    void endFenced() {
+        if (filter.isMode(MarkdownState.FENCEDINLINE)) {
+            putMark("```");
+        }
+        endPara();
+        filter.resetFencedLang();
     }
 
     void startPara(final int index, final MarkdownState status) {
@@ -104,16 +151,18 @@ class EntryHandler {
 
     /**
      * Functions called from Serializer.
+     *
      * @param node PegDown's TextNode node.
      */
     void putEntry(final TextNode node) {
         String text = node.getText();
         putEntry(text);
         currentBufPosition = node.getEndIndex();
-     }
+    }
 
     /**
      * Put entry and move current position.
+     *
      * @param text
      * @param index
      */
@@ -124,18 +173,20 @@ class EntryHandler {
 
     /**
      * Put entry without moving current position.
+     *
      * @param text
      */
     void putEntry(final String text) {
-         if (para > 0) {
+        if (para > 0) {
             sb.append(text);
         } else {
-             filter.writeTranslate(text, true);
-         }
+            filter.writeTranslate(text, true);
+        }
     }
 
     /**
      * Put protected entry and move current position.
+     *
      * @param chars
      * @param next
      */
@@ -146,16 +197,17 @@ class EntryHandler {
 
     /**
      * Put protected entry.
+     *
      * @param chars
      */
     void putMark(final String chars) {
-       putEntry(chars);
+        putEntry(chars);
     }
 
     /**
      * flush rest of untranslated source.
      */
-    void finish() {
+    void finish() throws TranslationException {
         int restSize = articleBuf.length - currentBufPosition;
         if (restSize > 0) {
             char[] buf = new char[restSize];
@@ -163,5 +215,12 @@ class EntryHandler {
             filter.writeTranslate(String.valueOf(buf), false);
             currentBufPosition += restSize;
         }
+        if (exception) {
+            throw new TranslationException();
+        }
+    }
+
+    void throwTranslationException() {
+        exception = true;
     }
 }

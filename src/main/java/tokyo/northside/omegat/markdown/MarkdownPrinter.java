@@ -38,6 +38,7 @@ class MarkdownPrinter {
     private int status = MarkdownState.NORMAL.flag;
     protected String lineFeed;
     private BufferedWriter writer;
+    private String fencedLang = "";
 
     /**
      * A Markdown printer to produce markdown file according to status.
@@ -75,6 +76,18 @@ class MarkdownPrinter {
         this.status = val;
     }
 
+    int getMode() {
+        return status;
+    }
+
+    void setFencedLang(final String lang) {
+        fencedLang = lang;
+    }
+
+    void resetFencedLang() {
+        fencedLang = "";
+    }
+
     protected String replaceEntry(final String text) {
         String tmp;
         StringBuilder sb = new StringBuilder();
@@ -83,7 +96,7 @@ class MarkdownPrinter {
             tmp = text.replaceAll("\\n", "\n\t");
             sb.append(tmp);
         } else if ((status & MarkdownState.FENCED.flag) > 0) {
-            sb.append("```\n").append(text).append("```");
+            sb.append("```").append(fencedLang).append("\n").append(text).append("```");
         } else if ((status & MarkdownState.BLOCKQUOTE.flag) > 0) {
             tmp = text.replaceAll("(.+)(\n)(.*)", "$1\n> $3");
             sb.append(tmp);

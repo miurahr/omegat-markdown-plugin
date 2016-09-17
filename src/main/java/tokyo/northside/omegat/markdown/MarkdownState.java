@@ -49,6 +49,11 @@ public enum MarkdownState {
     FENCED,
 
     /**
+     * Fenced quote inline.
+     */
+    FENCEDINLINE,
+
+    /**
      * Block quote printing.
      */
     BLOCKQUOTE;

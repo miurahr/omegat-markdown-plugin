@@ -89,9 +89,24 @@ public class FencedCodeTest {
         expected.add("Install the python `boto`library.It 's needed to access S3 service.\n```\nsudo easy_install boto\n```");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
-        throw new SkipException("Skip acceptance test.(known bug)");
-        //assertEquals(filter.getEntries(), expected);
-        //assertEquals(filter.getOutbuf(), testInput);
+        //throw new SkipException("Skip acceptance test.(known bug)");
+        assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getOutbuf(), testInput);
     }
 
+    @Test
+    public void testFencedCode_4() throws Exception {
+        String testInput = "```bash\n" +
+                "#pkg install autoconf automake intltool gsed libtool libevent2 curl \\\n" +
+                "  glib20 ossp-uuid sqlite3 jansson vala cmake py-simplejson libarchive\n" +
+                "```";
+        List<String> expected = new ArrayList<>();
+        expected.add(
+                "#pkg install autoconf automake intltool gsed libtool libevent2 curl \\\n" +
+                "  glib20 ossp-uuid sqlite3 jansson vala cmake py-simplejson libarchive\n");
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
 }

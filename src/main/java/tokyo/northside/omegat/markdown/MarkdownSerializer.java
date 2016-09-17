@@ -25,6 +25,7 @@
 
 package tokyo.northside.omegat.markdown;
 
+import org.omegat.filters2.TranslationException;
 import org.pegdown.ast.AnchorLinkNode;
 import org.pegdown.ast.AutoLinkNode;
 import org.pegdown.ast.BlockQuoteNode;
@@ -166,14 +167,30 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
      */
     @Override
     public void visit(final VerbatimNode node) {
-        if (handler.getChars(node.getStartIndex(), 3).equals("```")) {
-            handler.startPara(node.getStartIndex(), MarkdownState.FENCED);
+        int start = node.getStartIndex();
+        if (handler.getChars(start, 3).equals("```")) {
+            if (!handler.getChars(start + 3, 1).equals("\n")) {
+                // github favored fenced code with language name.
+                int langEnd = handler.findFirst(start + 3, '\n');
+                if (langEnd > 0 && langEnd > start) {
+                    String lang = handler.getChars(start + 3, langEnd - start - 3);
+                    handler.startFenced(start, lang);
+                    handler.putEntry(node);
+                    handler.endFenced();
+                } else {
+                    handler.throwTranslationException();
+                }
+            } else {
+                handler.startFenced(start, "");
+                handler.putEntry(node);
+                handler.endFenced();
+            }
         } else {
-            handler.startPara(MarkdownState.VERBATIM);
+            handler.startVerbatim(start);
+            handler.putEntry(node);
+            handler.endVerbatim();
         }
-        handler.putEntry(node);
-        handler.endPara();
-    }
+   }
 
     /**
      * Start paragraph, also to start entry.
