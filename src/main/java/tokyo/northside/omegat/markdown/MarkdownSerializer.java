@@ -340,9 +340,11 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         handler.putMark("[");
         visitChildren(node);
         handler.putMark("]");
-        handler.putMark("[");
-        visitChildren(node.referenceKey);
-        handler.putMark("]");
+        if (node.referenceKey != null) {
+            handler.putMark("[");
+            visitChildren(node.referenceKey);
+            handler.putMark("]");
+        }
     }
 
     public void visit(final QuotedNode node) {

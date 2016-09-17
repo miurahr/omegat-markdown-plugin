@@ -17,6 +17,7 @@ public class MarkdownIntegrationTest extends TestFilterBase {
         testTranslate("/source/test-cases/fencedcode");
         testTranslate("/source/test-cases/reference");
         testTranslate("/source/test-cases/table");
+        testTranslate("/source/test-cases/seafile_cli");
     }
 
 }
