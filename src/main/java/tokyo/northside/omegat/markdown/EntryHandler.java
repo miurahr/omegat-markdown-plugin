@@ -52,7 +52,6 @@ class EntryHandler {
         currentBufPosition = 0;
 
         para = 0;
-        st.empty();
         st.push(MarkdownState.NORMAL.flag);
     }
 
@@ -98,8 +97,6 @@ class EntryHandler {
         if (para <= 0) {
             putEntry(sb.toString());
             para = 0;
-            st.empty();
-            st.push(MarkdownState.NORMAL.flag);
         }
         st.pop();
         filter.setMode(st.peek());
