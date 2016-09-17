@@ -90,10 +90,10 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private static final int PARSER_OPTION = Extensions.ALL;
 
-    /** Protected scope for test mock */
+    /** Protected scope for test mock. */
     protected MarkdownPrinter printer;
 
-    /** put as field for debug */
+    /** put as field for debug. */
     private RootNode astRoot;
 
     /**
