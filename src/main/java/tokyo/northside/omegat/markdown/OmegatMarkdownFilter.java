@@ -29,11 +29,7 @@ import java.awt.Dialog;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -90,12 +86,14 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private String inEncodingLastParsedFile;
 
-    protected List<ProtectedPart> protectedParts = new ArrayList<>();
+    private List<ProtectedPart> protectedParts = new ArrayList<>();
 
-    protected static final int PARSER_OPTION = Extensions.ALL;
+    private static final int PARSER_OPTION = Extensions.ALL;
 
+    /** Protected scope for test mock */
     protected MarkdownPrinter printer;
 
+    /** put as field for debug */
     private RootNode astRoot;
 
     /**
@@ -341,7 +339,8 @@ public class OmegatMarkdownFilter implements IFilter {
         try (BufferedReader reader = getBufferedReader(inFile, inEncoding)) {
             if (outFile != null) {
                 String outEncoding = getOutputEncoding(fc);
-                try (BufferedWriter outfile = MarkdownFilterUtils.getBufferedWriter(outFile, outEncoding)) {
+                try (BufferedWriter outfile = MarkdownFilterUtils.getBufferedWriter(outFile,
+                        outEncoding)) {
                     this.printer = new MarkdownPrinter(outfile);
                     process(reader);
                     outfile.flush();

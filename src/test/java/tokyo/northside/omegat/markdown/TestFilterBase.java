@@ -25,6 +25,7 @@
 
 package tokyo.northside.omegat.markdown;
 
+import org.apache.commons.io.IOUtils;
 import org.omegat.core.data.ProtectedPart;
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
@@ -49,11 +50,12 @@ import static org.testng.Assert.assertEquals;
  * Base class for test filter parsing.
  * 
  * @author Alex Buloichik <alex73mail@gmail.com>
+ * @author Hiroshi Miura
  */
-public abstract class TestFilterBase  {
-    protected FilterContext context = new FilterContext();
+abstract class TestFilterBase  {
+    private FilterContext context = new FilterContext();
 
-    protected File outFile;
+    private File outFile;
 
     protected void test(final String testcase) throws Exception {
         OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
@@ -62,7 +64,7 @@ public abstract class TestFilterBase  {
         try (BufferedReader reader = MarkdownFilterUtils.getBufferedReader(new
                         File(this.getClass().getResource(testcase + ".json").getFile()),
                 "UTF-8")) {
-            String jsonString = MarkdownFilterUtils.toString(reader);
+            String jsonString = IOUtils.toString(reader);
             ArrayList expected = JSON.parseObject(jsonString, ArrayList.class);
             assertEquals(entries, expected, testcase);
         }
