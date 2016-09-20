@@ -19,7 +19,6 @@ sourceSets {
         test.compileClasspath += configurations.provided
         test.runtimeClasspath += configurations.provided
     }
-
     integrationTest {
         java {
             compileClasspath += main.output + test.output
@@ -33,6 +32,9 @@ sourceSets {
 }
 
 repositories {
+    maven {
+        url "https://dl.bintray.com/miurahr/maven/"
+    }
     jcenter()
 }
 
@@ -40,12 +42,10 @@ dependencies {
     compile 'org.pegdown:pegdown:1.6.0'
     provided 'commons-io:commons-io:2.4'
     provided 'commons-lang:commons-lang:2.6'
-    provided project(":stub")
+    provided 'org.omegat.gradle:gradle-omegat-plugin:0.9.0'
     testCompile 'org.testng:testng:6.9.10'
     testCompile 'com.alibaba:fastjson:1.2.17'
-    testCompile project(":stub")
     integrationTestCompile 'org.testng:testng:6.9.10'
-    integrationTestCompile project(":stub")
 }
 test.useTestNG()
 
@@ -129,9 +129,5 @@ distributions {
             }
         }
     }
-}
-
-project(":stub") {
-    apply plugin: 'java'
 }
 

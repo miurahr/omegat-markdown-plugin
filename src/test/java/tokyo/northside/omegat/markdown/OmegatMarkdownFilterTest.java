@@ -28,6 +28,8 @@ package tokyo.northside.omegat.markdown;
 import static org.testng.Assert.*;
 
 import org.omegat.filters2.FilterContext;
+import org.omegat.util.Language;
+
 import org.testng.annotations.*;
 
 import java.io.File;
@@ -67,7 +69,7 @@ class OmegatMarkdownFilterTest extends TestFilterBase {
     void testIsFileSupported_true() throws Exception {
         OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
         File target = new File(this.getClass().getResource("/source/case0.md").getFile());
-        FilterContext fc = new FilterContext();
+        FilterContext fc = new FilterContext(new Language("en"), new Language("be"), true);
         assertTrue(mdf.isFileSupported(target, null, fc));
     }
 
@@ -75,7 +77,7 @@ class OmegatMarkdownFilterTest extends TestFilterBase {
     void testIsFileSupported_false() throws Exception {
         OmegatMarkdownFilter mdf = new OmegatMarkdownFilter();
         File target = new File(this.getClass().getResource("/source/nomarkdown.txt").getFile());
-        FilterContext fc = new FilterContext();
+        FilterContext fc = new FilterContext(new Language("en"), new Language("be"), true);
         assertFalse(mdf.isFileSupported(target, null, fc));
     }
 

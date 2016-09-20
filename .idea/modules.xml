@@ -6,9 +6,6 @@
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_integrationTest.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_integrationTest.iml" group="omegat-markdown-plugin" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_main.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_main.iml" group="omegat-markdown-plugin" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_test.iml" filepath="$PROJECT_DIR$/.idea/modules/omegat-markdown-plugin_test.iml" group="omegat-markdown-plugin" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub.iml" group="stub" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub_main.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub_main.iml" group="stub" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/stub/stub_test.iml" filepath="$PROJECT_DIR$/.idea/modules/stub/stub_test.iml" group="stub" />
     </modules>
   </component>
 </project>

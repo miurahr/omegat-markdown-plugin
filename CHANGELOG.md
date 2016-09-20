@@ -2,6 +2,15 @@
 All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
+### Add
+- Now developer can make integration test case with JSON file.
+
+## Changed
+- Drop stub code and use remote Jar for OmegaT component.
+
+## Fixed
+- Test update to adopt remote jar.
+
 
 ## 0.3 -2016-09-14
 ### Add

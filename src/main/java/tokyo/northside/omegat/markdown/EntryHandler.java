@@ -216,7 +216,7 @@ class EntryHandler {
             currentBufPosition += restSize;
         }
         if (exception) {
-            throw new TranslationException();
+            throw new TranslationException("Markdown plugin got internal error(s).");
         }
     }
 
