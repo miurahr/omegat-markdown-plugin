@@ -39,11 +39,9 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.omegat.core.Core;
 import org.omegat.core.data.EntryKey;
-import org.omegat.core.data.IProject;
 import org.omegat.core.data.ProjectProperties;
 import org.omegat.core.data.ProtectedPart;
 import org.omegat.core.data.RealProject;
-import org.omegat.core.data.SourceTextEntry;
 import org.omegat.filters2.AbstractFilter;
 import org.omegat.filters2.FilterContext;
 import org.omegat.filters2.IAlignCallback;
@@ -186,7 +184,17 @@ abstract class TestFilterBase  {
 
     protected void translateText(IFilter filter, String resource, Map<String, String> config) throws Exception {
         translate(filter, resource, config);
-        FileUtils.contentEquals(new File(this.getClass().getResource(resource).getFile()), outFile);
+        boolean result = FileUtils.contentEquals(new File(this.getClass().getResource(resource)
+                .getFile()), outFile);
+        if (!result) {
+            List<String> origin = IOUtils.readLines(FileUtils.openInputStream(new File(this.getClass().getResource(resource)
+                .getFile())));
+            List<String> lines = IOUtils.readLines(FileUtils.openInputStream(outFile));
+            if (origin.size() != lines.size()) {
+                fail("Differ a number of lines. Original:" + origin.size() + ", outFile: " + lines.size());
+            }
+            assertEquals(lines, origin, resource);
+        }
     }
 
     /**
