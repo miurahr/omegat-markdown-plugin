@@ -27,6 +27,9 @@ package tokyo.northside.omegat.markdown;
 
 import org.testng.annotations.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.testng.Assert.*;
 
 /**
@@ -50,6 +53,32 @@ public class ListTest {
                 "2. Ordered Item2\n\n";
         MockFilter filter = new MockFilter();
         filter.process(testInput);
+        assertEquals(filter.getOutbuf(), testInput);
+    }
+
+    @Test
+    public void testOrderedListMultiple() throws Exception {
+        String testInput = "Multiple paragraphs:\n" +
+                "\n" +
+                "1.\tItem 1, graf one.\n" +
+                "\n" +
+                "\tItem 2. graf two. The quick brown fox jumped over the lazy dog's\n" +
+                "\tback.\n" +
+                "\t\n" +
+                "2.\tItem 2.\n" +
+                "\n" +
+                "3.\tItem 3.\n" +
+                "\n";
+        MockFilter filter = new MockFilter();
+        filter.process(testInput);
+        List<String> expected = new ArrayList<>();
+        expected.add("Multiple paragraphs:");
+        expected.add("Item 1, graf one." +
+                " Item 2. graf two. The quick brown fox jumped over the lazy dog's\n" +
+                "back.");
+        expected.add("Item 2.");
+        expected.add("Item 3.");
+        assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);
     }
 

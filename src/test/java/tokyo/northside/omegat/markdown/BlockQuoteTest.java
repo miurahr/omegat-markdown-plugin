@@ -30,54 +30,37 @@ import org.testng.annotations.Test;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test for quote elements.
  * Created by miurahr on 16/09/08.
  */
-public class QuoteTest {
+public class BlockQuoteTest {
     @Test
-    public void testQuote() throws Exception {
-        String testInput = "In the words of Abraham Lincoln:\n" +
-                "\n" +
-                "> Pardon my French\n\n";
-        List<String> expected = new ArrayList<>();
-        expected.add("In the words of Abraham Lincoln:");
-        expected.add("Pardon my French");
-        MockFilter filter = new MockFilter();
-        filter.process(testInput);
-        assertEquals(filter.getOutbuf(), testInput);
-        assertEquals(filter.getEntries(), expected);
-    }
-
-    @Test
-    public void testQuote_multi() throws Exception {
-        String testInput = "Here is multiple lines of quote:\n" +
-                "\n" +
-                "> quote 1\n" +
-                "> quote 2\n\n";
-        List<String> expected = new ArrayList<>();
-        expected.add("Here is multiple lines of quote:");
-        expected.add("quote 1\nquote 2");
-        MockFilter filter = new MockFilter();
-        filter.process(testInput);
-        assertEquals(filter.getEntries(), expected);
-        assertEquals(filter.getOutbuf(), testInput);
-    }
-
-    @Test
-    public void testQuoteTidyList() throws Exception {
-        String testInput = "> A list within a blockquote:\n" +
+    public void testBlockQuote() throws Exception {
+        String testInput = "\n> Example:\n" +
                 "> \n" +
-                "> *\tasterisk 1\n" +
-                "> *\tasterisk 2\n" +
-                "> *\tasterisk 3";
+                ">     sub status {\n" +
+                ">         print \"working\";\n" +
+                ">     }\n" +
+                "> \n" +
+                "> Or:\n" +
+                "> \n" +
+                ">     sub status {\n" +
+                ">         return \"working\";\n" +
+                ">     }\n\n";
         List<String> expected = new ArrayList<>();
-        expected.add("A list within a blockquote:");
-        expected.add("asterisk 1");
-        expected.add("asterisk 2");
-        expected.add("asterisk 3");
+        expected.add("Example:\n\n" +
+                     "    sub status {\n" +
+                     "        print \"working\";\n" +
+                     "    }\n" +
+                     "\n" +
+                     " Or:\n" +
+                     "\n" +
+                     "    sub status {\n" +
+                     "        return \"working\";\n" +
+                     "    }\n");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
