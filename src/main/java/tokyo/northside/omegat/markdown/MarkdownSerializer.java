@@ -262,6 +262,11 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         visitChildren(node);
         handler.putMark("](");
         handler.putEntry(node.url);
+        if (!node.title.isEmpty()) {
+            handler.putMark(" \"");
+            handler.putEntry(node.title);
+            handler.putMark("\"");
+        }
         handler.putMark(")", node.getEndIndex());
         handler.endPara();
     }
@@ -358,6 +363,9 @@ class MarkdownSerializer extends AbstractMarkdownSerializer implements Visitor {
         visitChildren(node);
         handler.putMark("]");
         if (node.referenceKey != null) {
+            if (node.separatorSpace != null) {
+                handler.putMark(node.separatorSpace);
+            }
             handler.putMark("[");
             visitChildren(node.referenceKey);
             handler.putMark("]");
