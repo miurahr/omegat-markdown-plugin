@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.languagetool:languagetool-core:3.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/languagetool-core/3.4/a9b2bf5ba2d87d5f8f3e42c5564ac84cc2a5d4af/languagetool-core-3.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/languagetool-core/3.4/2e9ffa5f1387cd17ebb6ac791eab5a7a7993a431/languagetool-core-3.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

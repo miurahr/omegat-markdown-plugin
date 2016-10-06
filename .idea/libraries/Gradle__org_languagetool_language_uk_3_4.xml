@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.languagetool:language-uk:3.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-uk/3.4/3de7f26ded2bd0d9b0f0ba7a86a20358d8d230b6/language-uk-3.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-uk/3.4/ae26006f325d42d882cd78179a9a4045f782566e/language-uk-3.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

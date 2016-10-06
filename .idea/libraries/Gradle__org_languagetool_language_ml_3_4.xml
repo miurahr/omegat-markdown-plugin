@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.languagetool:language-ml:3.4">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-ml/3.4/ff6a75a49b6cf82649a33bef35c50560097dd202/language-ml-3.4.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-ml/3.4/f0fc4bf55d191f3ae72a3c1de368e8944fd11318/language-ml-3.4-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

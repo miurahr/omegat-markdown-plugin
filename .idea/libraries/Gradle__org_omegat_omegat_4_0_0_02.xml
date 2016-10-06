@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: org.omegat:omegat:4.0.0-02">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.omegat/omegat/4.0.0-02/46cdc2ac4c8a84156ae76e2d4fac7a987316362b/omegat-4.0.0-02.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.omegat/omegat/4.0.0-02/b5d91e4511fddd725c97e275255b41d84863ba86/omegat-4.0.0-02-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
