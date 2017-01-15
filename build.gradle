@@ -39,7 +39,8 @@ repositories {
 }
 
 dependencies {
-    compile 'org.pegdown:pegdown:1.6.0'
+    compile 'com.vladsch.flexmark:flexmark-util:0.11.1'
+    compile 'com.vladsch.flexmark:flexmark:0.11.1'
     compile  'org.slf4j:slf4j-api:1.7.21'
     provided 'org.omegat:omegat:4.0.0-02'
     provided 'commons-io:commons-io:2.4'

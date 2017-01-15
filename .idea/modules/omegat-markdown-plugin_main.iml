@@ -9,14 +9,9 @@
     </content>
     <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
-    <orderEntry type="library" name="Gradle: org.pegdown:pegdown:1.6.0" level="project" />
+    <orderEntry type="library" name="Gradle: com.vladsch.flexmark:flexmark-util:0.11.1" level="project" />
+    <orderEntry type="library" name="Gradle: com.vladsch.flexmark:flexmark:0.11.1" level="project" />
     <orderEntry type="library" name="Gradle: org.slf4j:slf4j-api:1.7.21" level="project" />
-    <orderEntry type="library" name="Gradle: org.parboiled:parboiled-java:1.1.7" level="project" />
-    <orderEntry type="library" name="Gradle: org.parboiled:parboiled-core:1.1.7" level="project" />
-    <orderEntry type="library" name="Gradle: org.ow2.asm:asm:5.0.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-tree:5.0.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-analysis:5.0.3" level="project" />
-    <orderEntry type="library" name="Gradle: org.ow2.asm:asm-util:5.0.3" level="project" />
     <orderEntry type="library" name="Gradle: org.omegat:omegat:4.0.0-02" level="project" />
     <orderEntry type="library" name="Gradle: commons-io:commons-io:2.4" level="project" />
     <orderEntry type="library" name="Gradle: commons-lang:commons-lang:2.6" level="project" />

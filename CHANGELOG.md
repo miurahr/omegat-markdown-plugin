@@ -7,12 +7,13 @@ All notable changes to this project will be documented in this file.
 
 ## Changed
 - Drop stub code and use remote Jar for OmegaT component.
+- Use flexmark-java for parser
 
 ## Fixed
 - Test update to adopt remote jar.
 
 
-## 0.3 -2016-09-14
+## [0.3] -2016-09-14
 ### Add
 - Integration/Acceptance test.
 - Support Table.
@@ -25,7 +26,7 @@ All notable changes to this project will be documented in this file.
 - Treat correctry for quotes as in inline element
 - Every source files have license header.
 
-## 0.2 - 2016-09-03
+## [0.2] - 2016-09-03
 ### Add
 - Support protected part. now "**", "__" and "~~"  are protected.
 - Inline components now treat as inline.

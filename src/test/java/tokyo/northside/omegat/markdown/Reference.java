@@ -55,12 +55,12 @@ public class Reference {
         expected.add("[2]: http://att.com/  \"AT&T\"");
         MockFilter filter = new MockFilter();
         filter.process(testInput);
-        throw new SkipException("Skip acceptance test.(known bug)");
+        //throw new SkipException("Skip acceptance test.(known bug)");
         // FIXME:
         //  Entry[2] becomes "Here's an inline [link](/script?foo=1&bar=2)."
         //
-        //assertEquals(filter.getEntries(), expected);
-        //assertEquals(filter.getOutbuf(), testInput);
+        assertEquals(filter.getEntries(), expected);
+        assertEquals(filter.getOutbuf(), testInput);
     }
 
  }

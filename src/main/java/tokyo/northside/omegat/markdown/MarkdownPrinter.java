@@ -105,7 +105,7 @@ class MarkdownPrinter {
         if (status == MarkdownState.NORMAL.flag) {
             sb.append(text);
         }
-        return sb.toString().replaceAll("\\n", lineFeed);
+        return sb.toString().replaceAll("\\\\n", lineFeed);
     }
 
     /** Interface for debug. */

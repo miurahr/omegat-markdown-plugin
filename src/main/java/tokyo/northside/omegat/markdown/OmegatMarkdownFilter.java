@@ -36,6 +36,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.parser.ParserEmulationProfile;
+import com.vladsch.flexmark.util.options.MutableDataHolder;
+import com.vladsch.flexmark.util.options.MutableDataSet;
+
+import com.vladsch.flexmark.util.sequence.CharSubSequence;
 import org.omegat.core.Core;
 import org.omegat.core.data.ProtectedPart;
 import org.omegat.filters2.FilterContext;
@@ -48,11 +55,7 @@ import org.omegat.filters2.TranslationException;
 import org.omegat.util.NullBufferedWriter;
 
 import org.apache.commons.io.IOUtils;
-import org.pegdown.Extensions;
-import org.pegdown.PegDownProcessor;
-import org.pegdown.ast.RootNode;
 
-import static org.parboiled.common.Preconditions.checkArgNotNull;
 
 /**
  * Filter for Markdown.
@@ -89,13 +92,8 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private List<ProtectedPart> protectedParts = new ArrayList<>();
 
-    private static final int PARSER_OPTION = Extensions.ALL;
-
     /** Protected scope for test mock. */
     protected MarkdownPrinter printer;
-
-    /** put as field for debug. */
-    private RootNode astRoot;
 
     /**
      * Plugin loader.
@@ -122,6 +120,16 @@ public class OmegatMarkdownFilter implements IFilter {
         addProtectedPart("`", "q");
     }
 
+
+    Node markdown(String input) {
+        MutableDataHolder options = new MutableDataSet();
+        options.setFrom(ParserEmulationProfile.MARKDOWN);
+
+        Parser parser = Parser.builder(options).build();
+
+        Node document = parser.parse(input);
+        return document;
+    }
 
     /**
      * Human-readable name of the File Format this filter supports.
@@ -365,25 +373,24 @@ public class OmegatMarkdownFilter implements IFilter {
         process(IOUtils.toCharArray(reader));
     }
 
+    void process(final String text) throws IOException, TranslationException {
+        process(text.toCharArray());
+    }
+
     /**
      * Process Markdown Strings.
      * <p>
      * This method is for Test purpose.
      * </p>
      *
-     * @param testInput Markdown strings.
+     * @param article Markdown strings.
      */
-    void process(final String testInput) throws IOException, TranslationException {
-        process(testInput.toCharArray());
-    }
-
-    private void process(final char[] article) throws IOException, TranslationException {
+    private void process(char[] article) throws IOException, TranslationException {
         handler = new EntryHandler(this, article);
-        MarkdownSerializer serializer = new MarkdownSerializer(handler);
-        PegDownProcessor processor = new PegDownProcessor(PARSER_OPTION);
-        astRoot = processor.parseMarkdown(article);
-        checkArgNotNull(astRoot, "astRoot");
-        astRoot.accept(serializer);
+        MarkdownVisitor visitor = new MarkdownVisitor(handler);
+        Parser parser = Parser.builder().build();
+        Node astRoot = parser.parse(CharSubSequence.of(article, 0, article.length));
+        visitor.visit(astRoot);
         // If handler has a exception when process, finish() throws TranslationException
         handler.finish();
     }

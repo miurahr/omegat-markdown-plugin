@@ -25,8 +25,9 @@
 
 package tokyo.northside.omegat.markdown;
 
+import com.vladsch.flexmark.ast.Node;
 import org.omegat.filters2.TranslationException;
-import org.pegdown.ast.TextNode;
+
 
 import java.util.Stack;
 
@@ -154,10 +155,10 @@ class EntryHandler {
      *
      * @param node PegDown's TextNode node.
      */
-    void putEntry(final TextNode node) {
-        String text = node.getText();
+    void putEntry(final Node node) {
+        String text = node.getChars().toVisibleWhitespaceString();
         putEntry(text);
-        currentBufPosition = node.getEndIndex();
+        currentBufPosition = node.getEndOffset();
     }
 
     /**
