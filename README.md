@@ -6,7 +6,7 @@ This is an incomplete implementation of OmegaT plugin which support Markdown doc
 
 Please download zip file from Github release. You can get jar file from zip distribution.
 OmegaT plugin should be placed in `$HOME/.omegat/plugins`(Linux/UNIX),  `C:\Program Files\OmegaT\plugins`(Windows),
-or `~/Library/Preferences/OmegaT/plugins/`(MacOS) depending on your operating systems.
+or `~/Library/Preferences/OmegaT/plugins/`(Mac OS X) depending on your operating systems.
 
 ## Features
 
