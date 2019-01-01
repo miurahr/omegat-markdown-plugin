@@ -1,10 +1,12 @@
+plugins {
+    id "com.github.spotbugs" version "1.6.8"
+    id "com.github.johnrengelman.shadow" version "4.0.3"
+}
 apply plugin: 'java'
 apply plugin: 'jacoco'
-apply plugin: 'findbugs'
 apply plugin: 'checkstyle'
 apply plugin: 'distribution'
 apply plugin: 'idea'
-
 version = '0.3'
 
 configurations {
@@ -21,13 +23,21 @@ sourceSets {
     }
     integrationTest {
         java {
-            compileClasspath += main.output + test.output
-            compileClasspath += configurations.provided
-            runtimeClasspath += main.output + test.output
-            runtimeClasspath += configurations.provided
             srcDir file('src/integration-test/java')
         }
         resources.srcDir file('src/integration-test/resources')
+        compileClasspath += sourceSets.main.output + configurations.testCompile
+        compileClasspath += configurations.provided
+        runtimeClasspath += output + compileClasspath + configurations.testRuntime
+        runtimeClasspath += configurations.provided
+    }
+}
+
+idea {
+    module {
+        testSourceDirs += sourceSets.integrationTest.java.srcDirs
+        testResourceDirs += sourceSets.integrationTest.resources.srcDirs
+        scopes.TEST.plus += [ configurations.integrationTestCompile ]
     }
 }
 
@@ -39,9 +49,11 @@ repositories {
 }
 
 dependencies {
-    compile 'com.vladsch.flexmark:flexmark-util:0.11.1'
-    compile 'com.vladsch.flexmark:flexmark:0.11.1'
+    compile 'com.vladsch.flexmark:flexmark-all:0.40.0'
+    compile 'com.vladsch.flexmark:flexmark:0.40.0'
+    compile 'com.vladsch.flexmark:flexmark-util:0.40.0'
     compile  'org.slf4j:slf4j-api:1.7.21'
+    compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.9'
     provided 'org.omegat:omegat:4.0.0-02'
     provided 'commons-io:commons-io:2.4'
     provided 'commons-lang:commons-lang:2.6'
@@ -50,19 +62,25 @@ dependencies {
     testCompile 'com.alibaba:fastjson:1.2.17'
     integrationTestCompile 'org.testng:testng:6.9.10'
 }
+
 test.useTestNG()
 
 tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
 }
 
-jar {
-    from files(sourceSets.main.output.classesDir)
-    from {configurations.compile.collect {zipTree(it)}} {
-        exclude "META-INF/MANIFEST.MF"
-    }
+//jar {
+//    from {
+//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } {
+//            exclude "META-INF/MANIFEST.MF"
+//        }
+//    }
+//}
+
+shadowJar {
+    configurations = [project.configurations.compile]
     manifest {
-        attributes("OmegaT-Plugins": "tokyo.northside.omegat.markdown.OmegatMarkdownFilter")
+        attributes "OmegaT-Plugins": "tokyo.northside.omegat.markdown.OmegatMarkdownFilter"
     }
 }
 
@@ -70,35 +88,28 @@ checkstyle {
     config = resources.text.fromFile("${rootProject.projectDir}/config/checkstyle/checkstyle.xml")
     ignoreFailures = true
     toolVersion = '7.1'
+    sourceSets = [project.sourceSets.main]
 }
 tasks.checkstyleMain.setGroup('Verification')
 
-// Force prevent checkstyle/findbugs on Test.
-task checkstyleTest(overwrite: true) << {}
-task checkstyleIntegrationTest(overwrite: true) << {}
-task findbugsTest(overwrite: true) << {}
-task findbugsIntegrationTest(overwrite: true) << {}
-
-findbugs {
-    ignoreFailures = true
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+  reports {
+    xml.enabled = false
+    html.enabled = true
+  }
+  setGroup('Verification')
 }
-tasks.withType(FindBugs) {
-    reports {
-      xml.enabled = false
-      html.enabled = true
-    }
-    setGroup('Verification')
-}
-
 task integrationTest(type: Test) {
     description = "Integration/Acceptance Test"
-    testClassesDir = sourceSets.integrationTest.output.classesDir
+    group = 'verification'
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
     classpath = sourceSets.integrationTest.runtimeClasspath
+    outputs.upToDateWhen { false }
+    mustRunAfter test
     useTestNG()
 }
 check.dependsOn integrationTest
 integrationTest.mustRunAfter test
-tasks.integrationTest.setGroup('Verification')
 
 idea {
     module {
