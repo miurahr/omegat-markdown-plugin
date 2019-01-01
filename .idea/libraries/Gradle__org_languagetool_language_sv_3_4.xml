@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-sv/3.4/4754a5b7e30d7d0a1ac112b2a5694d5f5c460f32/language-sv-3.4.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-sv/3.4/680d632c79872991c19eeff1c699ff9d2fa0f22c/language-sv-3.4-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fifesoft/languagesupport/2.5.8/c55da0974b26b71accb6892b1010c67a61091138/languagesupport-2.5.8.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.fifesoft/languagesupport/2.5.8/8010b143c52a2402a654feb27833889260f920fb/languagesupport-2.5.8-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

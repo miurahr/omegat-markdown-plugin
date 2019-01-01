@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-gl/3.4/213e0a62c24e23b5e23a30cac2f33253b4e962cc/language-gl-3.4.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-gl/3.4/49d69aebd81a65c5669b96d920fbe74a1b31522b/language-gl-3.4-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

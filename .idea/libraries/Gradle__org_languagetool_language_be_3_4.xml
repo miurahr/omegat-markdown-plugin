@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-be/3.4/35a97e51d1d2b282f9eb7476a30380f46230cfee/language-be-3.4.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-be/3.4/ced71a58eda7d74be9992e9c5ea61d4f2d1ae12b/language-be-3.4-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

@@ -4,8 +4,6 @@
       <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-da/3.4/838e07692c1dbd6054eae3e567049b448f2cdb4/language-da-3.4.jar!/" />
     </CLASSES>
     <JAVADOC />
-    <SOURCES>
-      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.languagetool/language-da/3.4/a2e5d0dfba2f6164cd8a750b0864cf3b9e5c85de/language-da-3.4-sources.jar!/" />
-    </SOURCES>
+    <SOURCES />
   </library>
 </component>

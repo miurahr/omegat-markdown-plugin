@@ -1,0 +1,11 @@
+<component name="libraryTable">
+  <library name="Gradle: com.vladsch.flexmark:flexmark-html-parser:0.40.0">
+    <CLASSES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.vladsch.flexmark/flexmark-html-parser/0.40.0/88d7257f81401895467ee5ae442ed13026f63866/flexmark-html-parser-0.40.0.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES>
+      <root url="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.vladsch.flexmark/flexmark-html-parser/0.40.0/712f9f0c18f5d5f649eec714ec0cc177a7d0900d/flexmark-html-parser-0.40.0-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
