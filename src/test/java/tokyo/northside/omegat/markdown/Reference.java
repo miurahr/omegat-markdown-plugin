@@ -53,7 +53,7 @@ public class Reference {
         expected.add("Here's an inline [link](</script?foo=1&bar=2>).");
         expected.add("[1]: http://example.com/?foo=1&bar=2");
         expected.add("[2]: http://att.com/  \"AT&T\"");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         //throw new SkipException("Skip acceptance test.(known bug)");
         // FIXME:

@@ -1,13 +1,16 @@
 plugins {
     id "com.github.spotbugs" version "1.6.8"
-    id "com.github.johnrengelman.shadow" version "4.0.3"
 }
 apply plugin: 'java'
 apply plugin: 'jacoco'
 apply plugin: 'checkstyle'
 apply plugin: 'distribution'
 apply plugin: 'idea'
-version = '0.3'
+
+version = '0.4'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
 
 configurations {
     provided
@@ -51,7 +54,10 @@ repositories {
 dependencies {
     compile 'com.vladsch.flexmark:flexmark-all:0.40.0'
     compile 'com.vladsch.flexmark:flexmark:0.40.0'
+    compile 'com.vladsch.flexmark:flexmark-formatter:0.40.0'
     compile 'com.vladsch.flexmark:flexmark-util:0.40.0'
+    compile 'com.vladsch.flexmark:flexmark-ext-tables:0.40.0'
+    compile 'com.vladsch.flexmark:flexmark-ext-gfm-strikethrough:0.40.0'
     compile  'org.slf4j:slf4j-api:1.7.21'
     compileOnly 'com.github.spotbugs:spotbugs-annotations:3.1.9'
     provided 'org.omegat:omegat:4.0.0-02'
@@ -69,18 +75,13 @@ tasks.withType(JavaCompile) {
     options.compilerArgs << "-Xlint:deprecation" << "-Xlint:unchecked"
 }
 
-//jar {
-//    from {
-//        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } {
-//            exclude "META-INF/MANIFEST.MF"
-//        }
-//    }
-//}
-
-shadowJar {
-    configurations = [project.configurations.compile]
+jar {
     manifest {
         attributes "OmegaT-Plugins": "tokyo.northside.omegat.markdown.OmegatMarkdownFilter"
+    }
+ 
+    from {
+        configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }
     }
 }
 

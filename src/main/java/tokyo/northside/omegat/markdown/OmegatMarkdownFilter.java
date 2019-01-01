@@ -31,18 +31,37 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.Collections;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import com.vladsch.flexmark.ast.Node;
+import com.vladsch.flexmark.formatter.RenderPurpose;
+import com.vladsch.flexmark.formatter.TranslationHandler;
+import com.vladsch.flexmark.formatter.Formatter;
+import com.vladsch.flexmark.html.renderer.HeaderIdGenerator;
 import com.vladsch.flexmark.parser.Parser;
 import com.vladsch.flexmark.parser.ParserEmulationProfile;
+import com.vladsch.flexmark.util.ast.Document;
+import com.vladsch.flexmark.util.ast.Node;
+import com.vladsch.flexmark.util.format.MarkdownTable;
+import com.vladsch.flexmark.util.format.TableCellOffsetInfo;
+import com.vladsch.flexmark.util.format.options.DiscretionaryText;
+import com.vladsch.flexmark.util.format.options.TableCaptionHandling;
+import com.vladsch.flexmark.util.mappers.CharWidthProvider;
 import com.vladsch.flexmark.util.options.MutableDataHolder;
 import com.vladsch.flexmark.util.options.MutableDataSet;
-
 import com.vladsch.flexmark.util.sequence.CharSubSequence;
+
+import com.vladsch.flexmark.ext.autolink.AutolinkExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiExtension;
+import com.vladsch.flexmark.ext.emoji.EmojiImageType;
+import com.vladsch.flexmark.ext.emoji.EmojiShortcutType;
+import com.vladsch.flexmark.ext.gfm.strikethrough.StrikethroughExtension;
+import com.vladsch.flexmark.ext.gfm.tasklist.TaskListExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+
 import org.omegat.core.Core;
 import org.omegat.core.data.ProtectedPart;
 import org.omegat.filters2.FilterContext;
@@ -55,19 +74,12 @@ import org.omegat.filters2.TranslationException;
 import org.omegat.util.NullBufferedWriter;
 
 import org.apache.commons.io.IOUtils;
-
-
 /**
  * Filter for Markdown.
  *
  * @author Hiroshi Miura
  */
 public class OmegatMarkdownFilter implements IFilter {
-    /**
-     * Markdown Serializer callback handler.
-     */
-    private EntryHandler handler;
-
     /**
      * Callback for parse.
      */
@@ -92,8 +104,9 @@ public class OmegatMarkdownFilter implements IFilter {
 
     private List<ProtectedPart> protectedParts = new ArrayList<>();
 
-    /** Protected scope for test mock. */
-    protected MarkdownPrinter printer;
+    private List<String> translatingTexts;
+    private String translated;
+
 
     /**
      * Plugin loader.
@@ -263,6 +276,7 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc       filters context.
      * @param callback callback for parsed data
      * @throws IOException when I/O error happened.
+     * @throws TranslationException when translation error happened.
      */
     public final void parseFile(final File inFile, final Map<String, String> config,
                                 final FilterContext fc, final IParseCallback callback)
@@ -317,10 +331,12 @@ public class OmegatMarkdownFilter implements IFilter {
      * @param fc       filters context.
      * @param callback callback for get translation
      * @throws IOException when I/O error happened.
+     * @throws TranslationException when translation error happened.
      */
     public final void translateFile(final File inFile, final File outFile,
                                     final Map<String, String> config, final FilterContext fc,
-                                    final ITranslateCallback callback) throws IOException, TranslationException {
+                                    final ITranslateCallback callback)
+            throws IOException, TranslationException {
         entryParseCallback = null;
         entryTranslateCallback = callback;
         entryAlignCallback = null;
@@ -350,17 +366,15 @@ public class OmegatMarkdownFilter implements IFilter {
                 String outEncoding = getOutputEncoding(fc);
                 try (BufferedWriter outfile = MarkdownFilterUtils.getBufferedWriter(outFile,
                         outEncoding)) {
-                    this.printer = new MarkdownPrinter(outfile);
                     process(reader);
                     outfile.flush();
                     outfile.close();
                 }
             } else {
-                this.printer = new MarkdownPrinter(new NullBufferedWriter());
                 process(reader);
             }
             reader.close();
-        }
+         }
     }
 
     /**
@@ -370,90 +384,60 @@ public class OmegatMarkdownFilter implements IFilter {
      * @throws IOException throws when I/O error hapened.
      */
     void process(final BufferedReader reader) throws IOException, TranslationException {
-        process(IOUtils.toCharArray(reader));
-    }
-
-    void process(final String text) throws IOException, TranslationException {
-        process(text.toCharArray());
+        process(IOUtils.toString(reader));
     }
 
     /**
      * Process Markdown Strings.
-     * <p>
-     * This method is for Test purpose.
-     * </p>
-     *
      * @param article Markdown strings.
      */
-    private void process(char[] article) throws IOException, TranslationException {
-        handler = new EntryHandler(this, article);
-        MarkdownVisitor visitor = new MarkdownVisitor(handler);
-        Parser parser = Parser.builder().build();
-        Node astRoot = parser.parse(CharSubSequence.of(article, 0, article.length));
-        visitor.visit(astRoot);
-        // If handler has a exception when process, finish() throws TranslationException
-        handler.finish();
-    }
-
-    /**
-     * Process entry and write translation to translated file.
-     *
-     * @param value entry string.
-     * @param trans true when make translation for entry, otherwise write directory.
-     */
-    void writeTranslate(final String value, final boolean trans) {
-        if (!value.isEmpty()) {
-            String result;
-            if (trans) {
-                result = processEntry(value);
+    void process(final String article) throws IOException, TranslationException {
+        MutableDataSet options = new MutableDataSet()
+                .set(Parser.BLANK_LINES_IN_AST, true)
+                .set(Parser.EXTENSIONS, Arrays.asList(
+                    AutolinkExtension.create(),
+                    EmojiExtension.create(),
+                    StrikethroughExtension.create(),
+                    //TaskListExtension.create(),
+                    TablesExtension.create()
+                ))
+                // set GitHub table parsing options
+                .set(TablesExtension.WITH_CAPTION, false)
+                .set(TablesExtension.COLUMN_SPANS, false)
+                .set(TablesExtension.MIN_HEADER_ROWS, 1)
+                .set(TablesExtension.MAX_HEADER_ROWS, 1)
+                .set(TablesExtension.APPEND_MISSING_COLUMNS, true)
+                .set(TablesExtension.DISCARD_EXTRA_COLUMNS, true)
+                .set(TablesExtension.HEADER_SEPARATOR_COLUMN_MATCH, true)
+                .set(EmojiExtension.USE_SHORTCUT_TYPE, EmojiShortcutType.GITHUB)
+                .set(EmojiExtension.USE_IMAGE_TYPE, EmojiImageType.IMAGE_ONLY)
+                .set(Parser.LISTS_ORDERED_LIST_MANUAL_START, true);
+        Parser PARSER = Parser.builder(options).build();
+        Formatter FORMATTER = Formatter.builder(options).build();
+        Document node = PARSER.parse(article);
+        final TranslationHandler handler = FORMATTER
+                .getTranslationHandler(new HeaderIdGenerator.Factory());
+        final String formattedOutput = FORMATTER.translationRender(node, handler,
+                RenderPurpose.TRANSLATION_SPANS);
+        this.translatingTexts = handler.getTranslatingTexts();
+        final ArrayList<CharSequence> translatedTexts = new ArrayList<>(translatingTexts.size());
+        for (String entry: translatingTexts) {
+            if (entryParseCallback != null) {
+                entryParseCallback.addEntry(null, entry, null, false, null, null, this,
+                        ProtectedPart.extractFor(protectedParts, entry));
+            } else if (entryTranslateCallback != null) {
+                    String translation = entryTranslateCallback.getTranslation(null, entry, null);
+                    translatedTexts.add((translation == null) ? entry : translation);
             } else {
-                result = value;
-            }
-            try {
-                printer.write(result);
-            } catch (IOException e) {
-                System.err.println(e.getMessage());
+                    translatedTexts.add(entry);
             }
         }
-    }
-
-    /**
-     * Set printer mode, delete MarkdownPrinter.setMode().
-     * @param status status of printing.
-     */
-    void setMode(final int status) {
-        printer.setMode(status);
-    }
-
-    boolean isMode(MarkdownState state) {
-        return (printer.getMode() & state.flag) > 1;
-    }
-
-    void setFencedLang(final String lang) {
-        printer.setFencedLang(lang);
-    }
-
-    void resetFencedLang() {
-        printer.resetFencedLang();
-    }
-
-    /**
-     * Process entries and push it to OmegaT core.
-     * @param entry entry string to add.
-     * @return translation if TranslationCallback defined, otherwise original entry.
-     */
-    private String processEntry(final String entry) {
-        if (entryParseCallback != null) {
-            entryParseCallback.addEntry(null, entry, null, false, null, null, this,
-                    ProtectedPart.extractFor(protectedParts, entry));
-            return entry;
-        } else {
-            String translation = entryTranslateCallback.getTranslation(null, entry, null);
-            if (translation == null) {
-                translation = entry;
-            }
-            return translation;
-        }
+        handler.setTranslatedTexts(translatedTexts);
+        final String partial = FORMATTER.translationRender(node, handler,
+                RenderPurpose.TRANSLATED_SPANS);
+        Node partialDoc = PARSER.parse(partial);
+        this.translated = FORMATTER.translationRender(partialDoc, handler,
+                RenderPurpose.TRANSLATED);
     }
 
     /**
@@ -515,4 +499,15 @@ public class OmegatMarkdownFilter implements IFilter {
         }
         return br;
     }
+
+
+    /** for test */
+    List<String> getEntries() {
+        return translatingTexts;
+    }
+
+    /**
+     * Get buffer contents for Test.
+     */
+    String getOutbuf() {return translated;}
 }

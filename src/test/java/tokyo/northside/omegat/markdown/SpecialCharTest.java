@@ -42,7 +42,7 @@ public class SpecialCharTest {
         String testInput = "Here is a \"special character\" embedded.";
         List<String> expected = new ArrayList<>();
         expected.add("Here is a \"special character\" embedded.");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);
@@ -53,7 +53,7 @@ public class SpecialCharTest {
         String testInput = "Show file differences that **haven't been** staged";
         List<String> expected = new ArrayList<>();
         expected.add(testInput);
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);

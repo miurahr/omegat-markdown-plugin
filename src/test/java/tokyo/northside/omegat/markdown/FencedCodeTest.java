@@ -33,7 +33,7 @@ public class FencedCodeTest {
                 "key_id = your-key-id\n" +
                 "key = your-secret-key\n" +
                 "memcached_options = --SERVER=localhost --POOL-MIN=10 --POOL-MAX=100\n");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);
@@ -72,7 +72,7 @@ public class FencedCodeTest {
                 "key_id = your-key-id\n" +
                 "key = your-secret-key\n" +
                 "memcached_options = --SERVER=localhost --POOL-MIN=10 --POOL-MAX=100\n");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);
@@ -87,7 +87,7 @@ public class FencedCodeTest {
                 "```";
         List<String> expected = new ArrayList<>();
         expected.add("Install the python `boto`library.It 's needed to access S3 service.\n```\nsudo easy_install boto\n```");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         //throw new SkipException("Skip acceptance test.(known bug)");
         assertEquals(filter.getEntries(), expected);
@@ -104,7 +104,7 @@ public class FencedCodeTest {
         expected.add(
                 "#pkg install autoconf automake intltool gsed libtool libevent2 curl \\\n" +
                 "  glib20 ossp-uuid sqlite3 jansson vala cmake py-simplejson libarchive\n");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);

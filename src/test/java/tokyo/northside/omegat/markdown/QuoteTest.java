@@ -45,7 +45,7 @@ public class QuoteTest {
         List<String> expected = new ArrayList<>();
         expected.add("In the words of Abraham Lincoln:");
         expected.add("Pardon my French");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);
@@ -60,7 +60,7 @@ public class QuoteTest {
         List<String> expected = new ArrayList<>();
         expected.add("Here is multiple lines of quote:");
         expected.add("quote 1\nquote 2");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);
@@ -78,7 +78,7 @@ public class QuoteTest {
         expected.add("asterisk 1");
         expected.add("asterisk 2");
         expected.add("asterisk 3");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);

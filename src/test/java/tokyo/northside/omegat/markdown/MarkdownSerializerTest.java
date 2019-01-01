@@ -112,7 +112,7 @@ public class MarkdownSerializerTest {
         expected.add("unordered list (2)");
         expected.add("unordered list (3)\n" +
                 " continuous line.");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
     }
@@ -121,7 +121,7 @@ public class MarkdownSerializerTest {
     public void testVisit_inlineCode() throws Exception {
         String testInput = "By default, when building the site, all files are copied to the destination `_site` folder." +
                 "Some files are excluded in the `_config.yml` and `sdkdocs-template/jekyll/_config-defaults.yml` files.";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }
@@ -133,7 +133,7 @@ public class MarkdownSerializerTest {
         List<String> expected = new ArrayList<>();
         expected.add("Here is a list.");
         expected.add("Some are excluded in the `_config.yml` file.");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);

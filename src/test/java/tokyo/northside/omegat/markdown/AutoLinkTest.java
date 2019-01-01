@@ -43,7 +43,7 @@ public class AutoLinkTest {
         String testInput = "Link: <http://example.com/>.";
         List<String> expected = new ArrayList<>();
         expected.add(testInput);
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);

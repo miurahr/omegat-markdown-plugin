@@ -43,7 +43,7 @@ public class BackTickTest {
         String testInput = "Backtick: `` \\` ``";
         List<String> expected = new ArrayList<>();
         expected.add("Backtick: `` \\` ``");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
         assertEquals(filter.getEntries(), expected);

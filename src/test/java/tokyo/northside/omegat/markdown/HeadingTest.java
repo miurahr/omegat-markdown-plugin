@@ -38,7 +38,7 @@ public class HeadingTest {
     @Test
     public void testVisit_heading1() throws Exception {
         String testInput = "# HEADING1\n\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }
@@ -46,7 +46,7 @@ public class HeadingTest {
     @Test
     public void testVisit_heading2() throws Exception {
         String testInput = "## HEADING2\n\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }
@@ -54,7 +54,7 @@ public class HeadingTest {
     @Test
     public void testVisit_heading6() throws Exception {
         String testInput = "###### HEADING6\n\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }

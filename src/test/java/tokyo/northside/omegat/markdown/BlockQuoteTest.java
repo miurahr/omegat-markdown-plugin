@@ -61,7 +61,7 @@ public class BlockQuoteTest {
                      "    sub status {\n" +
                      "        return \"working\";\n" +
                      "    }\n");
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getEntries(), expected);
         assertEquals(filter.getOutbuf(), testInput);

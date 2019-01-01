@@ -38,7 +38,7 @@ public class LinkTest {
     @Test
     public void testLink_inline() throws Exception {
        String testInput = "[URL and title](/url/ \"title\").";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }

@@ -42,7 +42,7 @@ public class ListTest {
     public void testVisit_bulletList() throws Exception {
         String testInput = "- Item1\n\n" +
                 "- Item2\n\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }
@@ -51,7 +51,7 @@ public class ListTest {
     public void testVisit_orderedList() throws Exception {
         String testInput = "1. Ordered Item1\n\n" +
                 "2. Ordered Item2\n\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         assertEquals(filter.getOutbuf(), testInput);
     }
@@ -69,7 +69,7 @@ public class ListTest {
                 "\n" +
                 "3.\tItem 3.\n" +
                 "\n";
-        MockFilter filter = new MockFilter();
+        OmegatMarkdownFilter filter = new OmegatMarkdownFilter();
         filter.process(testInput);
         List<String> expected = new ArrayList<>();
         expected.add("Multiple paragraphs:");
