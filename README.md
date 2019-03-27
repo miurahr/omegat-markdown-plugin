@@ -1,6 +1,8 @@
-# Markdown filter plugin for OmegaT
+# Abandoned Markdown filter plugin for OmegaT
 
-This is an incomplete implementation of OmegaT plugin which support Markdown document for translation.
+_Please use OkAPI plugin_
+
+This is an abandoned implementation of OmegaT plugin.
 
 ## Install
 
