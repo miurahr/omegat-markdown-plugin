@@ -1,6 +1,6 @@
 # Abandoned Markdown filter plugin for OmegaT
 
-_Please use OkAPI plugin_
+_Please use [OkAPI Plugin](https://okapiframework.org/wiki/index.php?title=Okapi_Filters_Plugin_for_OmegaT) _ to support Markdown in OmegaT. 
 
 This is an abandoned implementation of OmegaT plugin.
 
